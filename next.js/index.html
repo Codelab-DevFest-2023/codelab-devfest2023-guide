@@ -20,14 +20,15 @@
   </style>
 </head>
 <body>
-  <google-codelab-analytics gaid="UA-49880327-14"></google-codelab-analytics>
+  <google-codelab-analytics gaid="UA-49880327-14" ga4id=""></google-codelab-analytics>
   <google-codelab codelab-gaid=""
+                  codelab-ga4id=""
                   id="next.js"
                   title="Rendu front, action ! Découvrez les différents modes de rendu avec Next.js"
                   environment="web"
                   feedback-link="">
     
-      <google-codelab-step label="Récupération du projet et installation des outils" duration="5">
+      <google-codelab-step label="Initialisation du codelab" duration="5">
         <p>Prérequis :</p>
 <ul>
 <li><a href="https://git-scm.com/" target="_blank">Git</a></li>
@@ -45,7 +46,7 @@ npm install
 
       </google-codelab-step>
     
-      <google-codelab-step label="Client Side Rendering - Liste des films" duration="20">
+      <google-codelab-step label="Client Side Rendering" duration="10">
         <p>Pour commencer, nous allons créer un écran affichant la liste des films en rendu côté client. Nous avons donc besoin de créer :</p>
 <ul>
 <li>Un composant <code>MoviesList</code> qui affiche la liste des films</li>
@@ -67,7 +68,7 @@ check(): string {
 }
 </code></pre>
 <p>La complétion dans l&#39;IDE nous aide à rajouter les imports de librairies nécessaires, mais au cas où voici les imports à ajouter :</p>
-<pre><code language="language-ts" class="language-ts">import { Controller, Get } from &#39;@nestjs/common&#39;;
+<pre><code language="language-ts" class="language-ts">import { Controller, Get } from &#34;@nestjs/common&#34;;
 </code></pre>
 <p>Vérifions que tout fonctionne en lançant l&#39;application en mode développement (live reload) :</p>
 <pre><code language="language-bash" class="language-bash">npm run start:dev
@@ -75,35 +76,30 @@ check(): string {
 <p>La route <code>health</code> est accessible dans un navigateur via <a href="http://localhost:3000/health" target="_blank">http://localhost:3000/health</a>.</p>
 <p>Nous allons maitenant activer le versionning d&#39;API et la documentation Swagger.</p>
 <p>Dans <code>src\main.ts</code>, rajoutons la configuration nécessaire dans la fonction <code>bootstrap</code>. Attention : l&#39;instruction <code>app.listen</code> doit rester la dernière instruction de la fonction.</p>
-<pre><code language="language-ts" class="language-ts">  // VERSIONNING
-  app.enableVersioning({
-    type: VersioningType.URI,
-  });
+<pre><code language="language-ts" class="language-ts">// VERSIONNING
+app.enableVersioning({
+  type: VersioningType.URI,
+});
 
-  //-------- SWAGGER
-  const config = new DocumentBuilder()
-    .setTitle(&#39;Form Earth to Moon API&#39;)
-    .setDescription(&#39;A codelab to discover NestJs and more&#39;)
-    .setVersion(&#39;1.0&#39;)
-    .build();
+//-------- SWAGGER
+const config = new DocumentBuilder()
+  .setTitle(&#34;Form Earth to Moon API&#34;)
+  .setDescription(&#34;A codelab to discover NestJs and more&#34;)
+  .setVersion(&#34;1.0&#34;)
+  .build();
 
-  const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup(&#39;api&#39;, app, document);
+const document = SwaggerModule.createDocument(app, config);
+SwaggerModule.setup(&#34;api&#34;, app, document);
 </code></pre>
 <p>Les imports à utiliser sont les suivants :</p>
-<pre><code language="language-ts" class="language-ts">import { DocumentBuilder, SwaggerModule } from &#39;@nestjs/swagger&#39;;
+<pre><code language="language-ts" class="language-ts">import { DocumentBuilder, SwaggerModule } from &#34;@nestjs/swagger&#34;;
 </code></pre>
 <p>Modifions <code>HealthController</code> pour rajouter un numéro de version sur son API :</p>
 <pre><code language="language-ts" class="language-ts">@Controller({ path: &#39;/health&#39;, version: &#39;1&#39; })
 </code></pre>
 <p>L&#39;URL de la route <code>health</code> est maintenant <a href="http://localhost:3000/v1/health" target="_blank">http://localhost:3000/v1/health</a>.</p>
 <p>L&#39;interface Swagger est accessible via <a href="http://localhost:3000/api" target="_blank">http://localhost:3000/api</a>. Nous pouvons y tester notre API.</p>
-
-
-      </google-codelab-step>
-    
-      <google-codelab-step label="Ressources Planet et Starship" duration="10">
-        <aside class="special"><p>Si vous n&#39;avez pas eu le temps de finir l&#39;étape précédente, vous pouvez faire un checkout de la branche &#34;step2&#34; pour débuter cette étape : <code>git checkout -f step2</code></p>
+<aside class="special"><p>Si vous n&#39;avez pas eu le temps de finir l&#39;étape précédente, vous pouvez faire un checkout de la branche &#34;step2&#34; pour débuter cette étape : <code>git checkout -f step2</code></p>
 </aside>
 <p>Nous allons maintenant créer une API pour la gestion de planètes. Pour ce faire, nous allons créer des classes <a href="https://docs.nestjs.com/controllers" target="_blank">controller</a>, <a href="https://docs.nestjs.com/providers#services" target="_blank">service</a>, DTO et entity et placer le tout dans un module dédié.</p>
 <p>Tout cela peut être préparé avec la commande suivante :</p>
@@ -198,7 +194,7 @@ kilometerPrice: number;
 
       </google-codelab-step>
     
-      <google-codelab-step label="TypeORM" duration="20">
+      <google-codelab-step label="Server Side Rendering" duration="20">
         <aside class="special"><p>Si vous n&#39;avez pas eu le temps de finir l&#39;étape précédente, vous pouvez faire un checkout de la branche &#34;step3&#34; pour débuter cette étape : <code>git checkout -f step3</code></p>
 </aside>
 <p>Nous allons maintenant activer l&#39;ORM <a href="https://typeorm.io/" target="_blank">TypeORM</a> pour lire des données dans une base de données <a href="https://www.sqlite.org/" target="_blank">SQLite</a>. Une base SQLite contenant déjà des données est incluse dans le repository cloné.</p>
@@ -214,7 +210,7 @@ kilometerPrice: number;
 name: string;
 </code></pre>
 <p>Les imports dans ces entités sont les suivants :</p>
-<pre><code language="language-ts" class="language-ts">import { Column, Entity } from &#39;typeorm&#39;;
+<pre><code language="language-ts" class="language-ts">import { Column, Entity } from &#34;typeorm&#34;;
 </code></pre>
 <p>Créons ensuite, dans <code>src\utils\default-entity.ts</code>, la classe <code>DefaultEntity</code> qui contient les propriétés communes à toutes les entités de notre application, à savoir :</p>
 <ul>
@@ -229,16 +225,16 @@ import { Exclude } from &#34;class-transformer&#34;;
 import { Column, Generated, PrimaryGeneratedColumn } from &#34;typeorm&#34;;
 
 export class DefaultEntity {
-    @Exclude()
-    @PrimaryGeneratedColumn(&#39;identity&#39;)
-    id: number;
-    
-    @Column()
-    active: boolean;
+  @Exclude()
+  @PrimaryGeneratedColumn(&#34;identity&#34;)
+  id: number;
 
-    @Column({ unique: true })
-    @Generated(&#34;uuid&#34;)
-    uuid: string;    
+  @Column()
+  active: boolean;
+
+  @Column({ unique: true })
+  @Generated(&#34;uuid&#34;)
+  uuid: string;
 }
 </code></pre>
 <p>Enfin, faisons hériter <code>Planet</code> et <code>Starship</code> de <code>DefaultEntity</code> :</p>
@@ -270,8 +266,8 @@ export class DefaultEntity {
   ],
 </code></pre>
 <p>Avec les imports suivants :</p>
-<pre><code language="language-ts" class="language-ts">import { ConfigModule, ConfigService } from &#39;@nestjs/config&#39;;
-import { TypeOrmModule, TypeOrmModuleOptions } from &#39;@nestjs/typeorm&#39;;
+<pre><code language="language-ts" class="language-ts">import { ConfigModule, ConfigService } from &#34;@nestjs/config&#34;;
+import { TypeOrmModule, TypeOrmModuleOptions } from &#34;@nestjs/typeorm&#34;;
 </code></pre>
 <p>Dans <code>src\planet\planet.module.ts</code>, ajoutons l&#39;import de TypeORM pour l&#39;entité <code>Planet</code> et l&#39;export du service <code>PlanetService</code> :</p>
 <pre><code language="language-ts" class="language-ts">  imports: [TypeOrmModule.forFeature([Planet])],
@@ -288,8 +284,8 @@ import { TypeOrmModule, TypeOrmModuleOptions } from &#39;@nestjs/typeorm&#39;;
   ) {}
 </code></pre>
 <p>Avec les imports suivants :</p>
-<pre><code language="language-ts" class="language-ts">import { InjectRepository } from &#39;@nestjs/typeorm&#39;;
-import { Repository } from &#39;typeorm/repository/Repository&#39;;
+<pre><code language="language-ts" class="language-ts">import { InjectRepository } from &#34;@nestjs/typeorm&#34;;
+import { Repository } from &#34;typeorm/repository/Repository&#34;;
 </code></pre>
 <p>Puis modifions la méthode <code>findAll()</code> pour utiliser le repository qui va exécuter la requête de récupération des objets <code>Planet</code> sur la base de données. La signature de la méthode est modifiée pour renvoyer un objet <code>Promise<Planet[]></code> :</p>
 <pre><code language="language-ts" class="language-ts">  findAll(): Promise&lt;Planet[]&gt; {
@@ -313,7 +309,7 @@ import { Repository } from &#39;typeorm/repository/Repository&#39;;
 
       </google-codelab-step>
     
-      <google-codelab-step label="CRUD Planet et Starship" duration="25">
+      <google-codelab-step label="Static Site Generation" duration="25">
         <aside class="special"><p>Si vous n&#39;avez pas eu le temps de finir l&#39;étape précédente, vous pouvez faire un checkout de la branche &#34;step4&#34; pour débuter cette étape : <code>git checkout -f step4</code></p>
 </aside>
 <p>Nous allons maintenant rajouter les opérations de récupération unitaire et d&#39;écriture en base de données.</p>
@@ -334,9 +330,9 @@ import { Repository } from &#39;typeorm/repository/Repository&#39;;
   active: boolean;
 </code></pre>
 <p>Avec les imports suivants :</p>
-<pre><code language="language-ts" class="language-ts">import { ApiProperty } from &#39;@nestjs/swagger&#39;;
-import { Expose } from &#39;class-transformer&#39;;
-import { IsBoolean, IsNumber, IsString } from &#39;class-validator&#39;;
+<pre><code language="language-ts" class="language-ts">import { ApiProperty } from &#34;@nestjs/swagger&#34;;
+import { Expose } from &#34;class-transformer&#34;;
+import { IsBoolean, IsNumber, IsString } from &#34;class-validator&#34;;
 </code></pre>
 <p><code>UpdatePlanetDto</code> hérite partiellement de <code>CreatePlanetDto</code> en rajoutant les propriétés nécessaires à la mise à jour :</p>
 <pre><code language="language-ts" class="language-ts">  @ApiProperty()
@@ -347,11 +343,11 @@ import { IsBoolean, IsNumber, IsString } from &#39;class-validator&#39;;
   uuid: string;
 </code></pre>
 <p>Avec les imports suivants :</p>
-<pre><code language="language-ts" class="language-ts">import { ApiProperty, PartialType } from &#39;@nestjs/swagger&#39;;
-import { Expose } from &#39;class-transformer&#39;;
-import { IsNotEmpty, IsUUID, IsOptional } from &#39;class-validator&#39;;
+<pre><code language="language-ts" class="language-ts">import { ApiProperty, PartialType } from &#34;@nestjs/swagger&#34;;
+import { Expose } from &#34;class-transformer&#34;;
+import { IsNotEmpty, IsUUID, IsOptional } from &#34;class-validator&#34;;
 </code></pre>
-<p>Procédons de même pour <code>CreateStarshipDto</code>  :</p>
+<p>Procédons de même pour <code>CreateStarshipDto</code> :</p>
 <pre><code language="language-ts" class="language-ts">  @ApiProperty()
   @Expose()
   @IsString()
@@ -361,7 +357,7 @@ import { IsNotEmpty, IsUUID, IsOptional } from &#39;class-validator&#39;;
   @Expose()
   @IsNumber()
   speed: number;
-  
+
   @ApiProperty()
   @Expose()
   @IsNumber()
@@ -380,23 +376,23 @@ import { IsNotEmpty, IsUUID, IsOptional } from &#39;class-validator&#39;;
   @IsOptional()
   uuid: string;
 </code></pre>
-<p>Pour que les annotations soient actives, nous devons ajouter la configuration suivante dans la méthode <code>bootstrap</code> de  <code>src\main.ts</code> :</p>
-<pre><code language="language-ts" class="language-ts">  //------- IN &amp; OUT
-  // Enables global behaviors on incoming DTO
-  app.useGlobalPipes(
-    new ValidationPipe({
-      whitelist: true, // Only exposed attributes will be accepted on incoming DTO
-      transform: true, // Automatically converts attributes from incoming DTO when possible
-      transformOptions: { enableImplicitConversion: true },
-    }),
-  );
+<p>Pour que les annotations soient actives, nous devons ajouter la configuration suivante dans la méthode <code>bootstrap</code> de <code>src\main.ts</code> :</p>
+<pre><code language="language-ts" class="language-ts">//------- IN &amp; OUT
+// Enables global behaviors on incoming DTO
+app.useGlobalPipes(
+  new ValidationPipe({
+    whitelist: true, // Only exposed attributes will be accepted on incoming DTO
+    transform: true, // Automatically converts attributes from incoming DTO when possible
+    transformOptions: { enableImplicitConversion: true },
+  })
+);
 
-  // Enables global behaviors on outgoing entities
-  // For examples, @Exclude decorators will be processed
-  app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)));
+// Enables global behaviors on outgoing entities
+// For examples, @Exclude decorators will be processed
+app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)));
 </code></pre>
 <p>Avec les imports suivants :</p>
-<pre><code language="language-ts" class="language-ts">import { ClassSerializerInterceptor, ValidationPipe } from &#39;@nestjs/common&#39;;
+<pre><code language="language-ts" class="language-ts">import { ClassSerializerInterceptor, ValidationPipe } from &#34;@nestjs/common&#34;;
 </code></pre>
 <p>Modifions <code>PlanetService</code> pour utiliser les DTO et le repository.</p>
 <p>Commençons par la méthode <code>create()</code>. Le type de retour est modifié pour correspondre au type de retour de la méthode <code>save()</code> du repository :</p>
@@ -434,8 +430,8 @@ import { IsNotEmpty, IsUUID, IsOptional } from &#39;class-validator&#39;;
   }
 </code></pre>
 <p>Avec les imports suivants :</p>
-<pre><code language="language-ts" class="language-ts">import { NotFoundException } from &#39;@nestjs/common&#39;;
-import { DeleteResult } from &#39;typeorm&#39;;
+<pre><code language="language-ts" class="language-ts">import { NotFoundException } from &#34;@nestjs/common&#34;;
+import { DeleteResult } from &#34;typeorm&#34;;
 </code></pre>
 <p>La classe <code>PlanetController</code> doit être modifiée pour prendre en compte nos modifications sur <code>PlanetService</code> et pour utiliser des UUID :</p>
 <pre><code language="language-ts" class="language-ts">  @Get(&#39;:uuid&#39;)
@@ -465,8 +461,8 @@ import { DeleteResult } from &#39;typeorm&#39;;
   export class PlanetController {
 </code></pre>
 <p>Les imports à utiliser sont les suivants :</p>
-<pre><code language="language-ts" class="language-ts">import { Body, ParseUUIDPipe } from &#39;@nestjs/common&#39;;
-import { ApiTags } from &#39;@nestjs/swagger&#39;;
+<pre><code language="language-ts" class="language-ts">import { Body, ParseUUIDPipe } from &#34;@nestjs/common&#34;;
+import { ApiTags } from &#34;@nestjs/swagger&#34;;
 </code></pre>
 <p>Procédons de même pour <code>StarshipService</code> :</p>
 <pre><code language="language-ts" class="language-ts">  create(createStarshipDto: CreateStarshipDto): Promise&lt;Starship&gt; {
@@ -566,8 +562,7 @@ export class StarshipController {
 
       </google-codelab-step>
     
-      <google-codelab-step label="Création de la ressource 
-Booking" duration="15">
+      <google-codelab-step label="React Server Components" duration="15">
         <aside class="special"><p>Si vous n&#39;avez pas eu le temps de finir l&#39;étape précédente, vous pouvez faire un checkout de la branche &#34;step5&#34; pour débuter cette étape : <code>git checkout -f step5</code></p>
 </aside>
 <p>Dans cette étape nous allons créer une nouvelle ressource : <code>booking</code> :</p>
@@ -615,7 +610,7 @@ price: number;
   }
 </code></pre>
 <p>Attention à l&#39;import de <code>dayjs</code> :</p>
-<pre><code language="language-ts" class="language-ts">import * as dayjs from &#39;dayjs&#39;;
+<pre><code language="language-ts" class="language-ts">import * as dayjs from &#34;dayjs&#34;;
 </code></pre>
 <p>Modifions la classe <code>CreateBookingDto</code> en rajoutant les propriétés ci-après. Elle sera utilisée pour décrire l&#39;entrée nécessaire au service de création d&#39;une réservation.</p>
 <pre><code language="language-ts" class="language-ts">@ApiProperty()
@@ -645,12 +640,12 @@ departureDate: Date;
 </code></pre>
 <p>Modifions également la classe <code>UpdateBookingDto</code> qui définira l&#39;entrée nécessaire pour modifier une réservation. L&#39;utilisation de <code>PartialType</code>, importé de <code>@nestjs/swagger</code> permet d&#39;indiquer qu&#39;on a les mêmes propriétés que <code>CreateBookingDto</code> mais qu&#39;elles sont optionnelles.</p>
 <pre><code language="language-ts" class="language-ts">export class UpdateBookingDto extends PartialType(CreateBookingDto) {
-    @ApiProperty()
-    @Expose()
-    @IsNotEmpty()
-    @IsUUID()
-    @IsOptional()
-    uuid: string;
+  @ApiProperty()
+  @Expose()
+  @IsNotEmpty()
+  @IsUUID()
+  @IsOptional()
+  uuid: string;
 }
 </code></pre>
 <p>Enrichir le service <code>BookingService</code>. Injectons d&#39;abord les dépendances nécessaires dans le constructeur.</p>
@@ -757,127 +752,6 @@ findOne(@Param(&#39;uuid&#39;, new ParseUUIDPipe()) uuid: string): Promise&lt;Bo
 @Controller({ path: &#39;/bookings&#39;, version: &#39;1&#39; })
 </code></pre>
 <p>Il est maintenant possible de manipuler les bookings avec leur API dans Swagger.</p>
-
-
-      </google-codelab-step>
-    
-      <google-codelab-step label="Sécurisation des contrôleurs" duration="10">
-        <aside class="special"><p>Si vous n&#39;avez pas eu le temps de finir l&#39;étape précédente, vous pouvez faire un checkout de la branche &#34;step6&#34; pour débuter cette étape : <code>git checkout -f step6</code></p>
-</aside>
-<p>Nous allons sécuriser l&#39;accès à nos endoints en exigeant la fourniture d&#39;un bearer d&#39;authentification dans les headers des requêtes. Nous allons créer un &#34;guard&#34;, un composant NestJS qui permet de contrôler l&#39;accès à des routes.</p>
-<p>Dans le fichier <code>.env</code> ajouter la variable d&#39;environnement <code>API_BEARER</code> qui définit la valeur attendue pour le bearer :</p>
-<pre><code>API_BEARER=MyBearer
-</code></pre>
-<p>Créer un nouveau module <code>security</code> :</p>
-<pre><code language="language-bash" class="language-bash">nest g module security
-</code></pre>
-<p>Créer un guard dans ce module :</p>
-<pre><code language="language-bash" class="language-bash">nest g guard security/bearer
-</code></pre>
-<p>Compléter le code du guard comme ci-dessous :</p>
-<pre><code language="language-ts" class="language-ts">import { CanActivate, ExecutionContext, Injectable, Logger } from &#39;@nestjs/common&#39;;
-import { ConfigService } from &#39;@nestjs/config&#39;;
-import { Observable } from &#39;rxjs&#39;;
-
-@Injectable()
-export class BearerGuard implements CanActivate {
-  private readonly logger = new Logger(BearerGuard.name);
-
-  constructor(private configService: ConfigService) {}
-
-  canActivate(context: ExecutionContext): boolean | Promise&lt;boolean&gt; | Observable&lt;boolean&gt; {
-    const request = context.switchToHttp().getRequest();
-
-    if (request?.headers?.authorization === `Bearer ${this.configService.get&lt;string&gt;(&#39;API_BEARER&#39;)}`) {
-      return true;
-    }
-
-    this.logger.warn(`An unauthorized call has been made on a API endpoint`);
-    return false;
-  }
-}
-</code></pre>
-<p>Quelques explications :</p>
-<ul>
-<li>L&#39;interface <code>CanActivate</code> permet d&#39;activer ou non une route en fonction du résultat de la méthode <code>canActivate</code></li>
-<li>On contrôle la présence d&#39;un header <code>authorization</code> avec comme valeur attendue celle saisie dans le fichier <code>.env</code>, récupérée grâce au service <code>ConfigService</code>.</li>
-</ul>
-<p>Activons maintenant ce guard pour l&#39;ensemble des routes de l&#39;application en ajoutant les lignes suivantes dans le fichier <code>main.ts</code> :</p>
-<pre><code language="language-ts" class="language-ts">  const configService = app.get&lt;ConfigService&gt;(ConfigService);
-
-  // SECURITY
-  app.useGlobalGuards(new BearerGuard(configService));
-</code></pre>
-<p>Nous devons maintenant configurer Swagger pour activer la saisie du header <code>authorization</code> dans Swagger UI.</p>
-<p>Toujours dans le fichier <code>main.ts</code> modifier la configuration de Swagger en faisant appel à la méthode <code>addBearerAuth</code>.</p>
-<pre><code language="language-ts" class="language-ts">  const config = new DocumentBuilder()
-    .setTitle(&#39;Form Earth to Moon API&#39;)
-    .setDescription(&#39;A codelab to discover NestJs and more&#39;)
-    .setVersion(&#39;1.0&#39;)
-    .addBearerAuth()
-    .build();
-</code></pre>
-<p>Enfin sur chacun des contrôleurs ajouter le décorateur <code>@ApiBearerAuth</code> importé de Swagger. Par exemple dans <code>BookingController</code> :</p>
-<pre><code language="language-ts" class="language-ts">@ApiTags(&#39;bookings&#39;)
-@ApiBearerAuth()
-@Controller({ path: &#39;/bookings&#39;, version: &#39;1&#39; })
-export class BookingController {
-</code></pre>
-<p>Il ne reste plus qu&#39;à lancer Swagger UI. Tester les services sans bearer : on a une erreur 403. Puis cliquer sur le bouton <code>Authenticate</code>, saisir la valeur du bearer (juste la valeur de la clé) et tester les services, ils doivent désormais passer.</p>
-
-
-      </google-codelab-step>
-    
-      <google-codelab-step label="Gestion de la configuration" duration="10">
-        <aside class="special"><p>Si vous n&#39;avez pas eu le temps de finir l&#39;étape précédente, vous pouvez faire un checkout de la branche &#34;step7&#34; pour débuter cette étape : <code>git checkout -f step7</code></p>
-</aside>
-<p>Nous allons maintenant améliorer la gestion de configuration en bloquant le démarrage de l&#39;application si des variables d&#39;environnement ne sont pas correctes et en évitant l&#39;accès direct aux variables d&#39;environnement depuis les composants de l&#39;application.</p>
-<p>Créons le fichier <code>config/configuration.ts</code> qui va définir le mapping entre nos clés de configuration et des variables d&#39;environnement :</p>
-<pre><code language="language-ts" class="language-ts">export default () =&gt; ({
-  port: parseInt(process.env.PORT, 10) || 3000,
-  database: {
-    path: process.env.SQL_MEMORY_DB_SHARED,
-  },
-  security: {
-    apiBearer: process.env.API_BEARER,
-  },
-});
-</code></pre>
-<p>Créons un schéma de validation pour cette configuration dans le fichier <code>config/schema.ts</code> en utilisant la librairie <code>Joi</code> :</p>
-<pre><code language="language-ts" class="language-ts">import * as Joi from &#39;joi&#39;;
-
-export default Joi.object({
-  NODE_ENV: Joi.string().valid(&#39;development&#39;, &#39;production&#39;, &#39;test&#39;, &#39;provision&#39;).default(&#39;development&#39;),
-  PORT: Joi.number().default(3000),
-  SQL_MEMORY_DB_SHARED: Joi.string().required(),
-  API_BEARER: Joi.string().required(),
-});
-</code></pre>
-<p>Modifions la configuration du module <code>ConfigModule</code> dans <code>app.module.ts</code></p>
-<pre><code language="language-ts" class="language-ts">  ConfigModule.forRoot({
-    load: [configuration],
-    validationSchema: configurationSchema,
-    validationOptions: {
-      abortEarly: true,
-    },
-  }),
-</code></pre>
-<p>Avec les imports suivants :</p>
-<pre><code language="language-ts" class="language-ts">import configuration from &#39;./config/configuration&#39;;
-import configurationSchema from &#39;./config/schema&#39;;
-</code></pre>
-<p>Modifions le paramétrage du port d&#39;écoute de l&#39;application dans <code>main.ts</code>:</p>
-<pre><code language="language-ts" class="language-ts">await app.listen(configService.get(&#39;port&#39;));
-</code></pre>
-<p>Ainsi que la clé permettant de récupérer path de la base de données, toujours dans <code>app.module.ts</code> :</p>
-<pre><code language="language-ts" class="language-ts">database: configService.get(&#39;database.path&#39;),
-</code></pre>
-<p>Enfin modifions la clé de récupération du bearer d&#39;authentification dans <code>bearer.guard.ts</code> :</p>
-<pre><code language="language-ts" class="language-ts">if (request?.headers?.authorization === `Bearer ${this.configService.get&lt;string&gt;(&#39;security.apiBearer&#39;)}`) {
-</code></pre>
-<p>Mettons en commentaire la variable d&#39;environnement <code>API_BEARER</code> dans le fichier <code>.env</code> et démarrons le serveur avec <code>npm run start:dev</code> : on doit avoir un message d&#39;erreur indiquant le nom de la variable manquante.</p>
-<p>Décommentons la variable et relançons <code>npm run start:dev</code> : l&#39;application démarre bien sur le port <code>3000</code> et les services fonctionnent correctement.</p>
-<p>Ajoutons maintenant un paramètre <code>PORT</code> avec la valeur <code>8080</code> dans le fichier <code>.env</code> et relançons <code>npm run start:dev</code> : l&#39;application démarre désormais sur le port <code>8080</code>.</p>
 
 
       </google-codelab-step>
