@@ -1,4 +1,4 @@
-id:next.js
+id:docs
 
 # Rendu front, action ! Découvrez les différents modes de rendu avec Next.js
 
