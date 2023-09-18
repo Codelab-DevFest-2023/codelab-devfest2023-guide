@@ -69,18 +69,20 @@ npm install
 <li>Un composant <code>MoviesList</code> qui affiche la liste des films</li>
 <li>Une route <code>/movies</code> associée au composant <code>MoviesList</code></li>
 </ul>
-<p>Dans le répertoire <code>/src/hooks</code> du projet créons le fichier <code>useMovies.ts</code> avec le contenu suivant :</p>
-<p>TODO Code à vérifier</p>
+<p>Dans le répertoire <code>/src/hooks</code> du projet créons le fichier <code>useMovies.ts</code>. Ce hook s&#39;appuie sur la librairie React Query pour gérer du cache.</p>
 <pre><code language="language-ts" class="language-ts">import { useQuery } from &#34;@tanstack/react-query&#34;;
 
 export default useMovies = () =&gt; {
   return useQuery({});
 };
 </code></pre>
-<p>TODO Création du hook <code>useMovies</code></p>
-<p>Puis dans le répertoire <code>/src/pages</code> nous allons créer le fichier <code>MoviesListPage.tsx</code></p>
-<p>TODO Création du composant <code>MoviesList</code></p>
-<p>TODO Création de la route <code>/movies</code></p>
+<p>Puis dans le répertoire <code>/src/pages</code> nous allons créer le fichier <code>MoviesListPage.tsx</code> qui utilise le hook <code>useMovies</code> pour récupérer les films puis parcourt les films pour afficher une card pour chaque film. Un loader est affiché pendant le chargement des films.</p>
+<pre><code language="language-ts" class="language-ts">TODO;
+</code></pre>
+<p>Enfin nous allons créer une route <code>/movies</code> dans le fichier <code>/src/router.ts</code>. Cette route est associée au composant <code>MoviesListPage</code>.</p>
+<pre><code language="language-ts" class="language-ts">TODO;
+</code></pre>
+<p>Nous pouvons démarrer l&#39;application avec la commande <code>npm run dev</code> et constater que la liste des films s&#39;affiche correctement.</p>
 <h2 is-upgraded>Détail d&#39;un film</h2>
 <p>Ensuite nous allons créer un écran affichant le détail de chaque film. Nous avons besoin de créer :</p>
 <ul>
@@ -88,16 +90,27 @@ export default useMovies = () =&gt; {
 <li>Un composant <code>MovieDetailsPage</code> qui définit la page de détail d&#39;un film</li>
 <li>Une route <code>/movies/:id</code> qui définit des routes pour le</li>
 </ul>
-<h2 is-upgraded>Analysons cette application</h2>
-<p>Lançons maintenant l&#39;application :</p>
-<pre><code language="language-bash" class="language-bash">npm run dev
+<p>Dans le répertoire <code>/src/hooks</code> du projet créons le fichier <code>useMovie.ts</code> avec le contenu suivant :</p>
+<pre><code language="language-ts" class="language-ts">import { useQuery } from &#34;@tanstack/react-query&#34;;
+
+export default useMovie = () =&gt; {
+  return useQuery({...});
+};
 </code></pre>
+<p>Puis dans le répertoire <code>/src/pages</code> nous allons créer le fichier <code>MovieDetailsPage.tsx</code> qui utilise le hook <code>useMovie</code> pour récupérer le détail du film puis afficher les informations. Un loader est affiché pendant le chargement du film.</p>
+<pre><code language="language-ts" class="language-ts">TODO;
+</code></pre>
+<p>Enfin nous allons créer une route <code>/movies/:id</code> dans le fichier <code>/src/router.ts</code>. Cette route est associée au composant <code>MovieDetailsPage</code>.</p>
+<pre><code language="language-ts" class="language-ts">TODO;
+</code></pre>
+<p>Nous pouvons démarrer l&#39;application avec la commande <code>npm run dev</code> et constater que la liste des films s&#39;affiche correctement.</p>
+<h2 is-upgraded>Analysons cette application</h2>
 <p>Ouvrons les devtools de Chrome (ou équivalent) pour observer :</p>
 <ul>
 <li>Les chargements de fichiers Javascript</li>
 <li>Les appels de service REST</li>
 </ul>
-<p>Enfin affichons le code source de la page pour constater que cette page n&#39;est pas</p>
+<p>Enfin affichons le code source de la page pour constater que cette page n&#39;est pas très &#34;SEO friendly&#34; !</p>
 
 
       </google-codelab-step>
