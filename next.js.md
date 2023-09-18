@@ -55,9 +55,7 @@ Pour commencer, nous allons créer un écran affichant la liste des films. Nous 
 - Un composant `MoviesList` qui affiche la liste des films
 - Une route `/movies` associée au composant `MoviesList`
 
-Dans le répertoire `/src/hooks` du projet créons le fichier `useMovies.ts` avec le contenu suivant :
-
-TODO Code à vérifier
+Dans le répertoire `/src/hooks` du projet créons le fichier `useMovies.ts`. Ce hook s'appuie sur la librairie React Query pour gérer du cache.
 
 ```ts
 import { useQuery } from "@tanstack/react-query";
@@ -67,13 +65,19 @@ export default useMovies = () => {
 };
 ```
 
-TODO Création du hook `useMovies`
+Puis dans le répertoire `/src/pages` nous allons créer le fichier `MoviesListPage.tsx` qui utilise le hook `useMovies` pour récupérer les films puis parcourt les films pour afficher une card pour chaque film. Un loader est affiché pendant le chargement des films.
 
-Puis dans le répertoire `/src/pages` nous allons créer le fichier `MoviesListPage.tsx`
+```ts
+TODO;
+```
 
-TODO Création du composant `MoviesList`
+Enfin nous allons créer une route `/movies` dans le fichier `/src/router.ts`. Cette route est associée au composant `MoviesListPage`.
 
-TODO Création de la route `/movies`
+```ts
+TODO;
+```
+
+Nous pouvons démarrer l'application avec la commande `npm run dev` et constater que la liste des films s'affiche correctement.
 
 ### Détail d'un film
 
@@ -83,20 +87,38 @@ Ensuite nous allons créer un écran affichant le détail de chaque film. Nous a
 - Un composant `MovieDetailsPage` qui définit la page de détail d'un film
 - Une route `/movies/:id` qui définit des routes pour le
 
-### Analysons cette application
+Dans le répertoire `/src/hooks` du projet créons le fichier `useMovie.ts` avec le contenu suivant :
 
-Lançons maintenant l'application :
+```ts
+import { useQuery } from "@tanstack/react-query";
 
-```bash
-npm run dev
+export default useMovie = () => {
+  return useQuery({...});
+};
 ```
+
+Puis dans le répertoire `/src/pages` nous allons créer le fichier `MovieDetailsPage.tsx` qui utilise le hook `useMovie` pour récupérer le détail du film puis afficher les informations. Un loader est affiché pendant le chargement du film.
+
+```ts
+TODO;
+```
+
+Enfin nous allons créer une route `/movies/:id` dans le fichier `/src/router.ts`. Cette route est associée au composant `MovieDetailsPage`.
+
+```ts
+TODO;
+```
+
+Nous pouvons démarrer l'application avec la commande `npm run dev` et constater que la liste des films s'affiche correctement.
+
+### Analysons cette application
 
 Ouvrons les devtools de Chrome (ou équivalent) pour observer :
 
 - Les chargements de fichiers Javascript
 - Les appels de service REST
 
-Enfin affichons le code source de la page pour constater que cette page n'est pas
+Enfin affichons le code source de la page pour constater que cette page n'est pas très "SEO friendly" !
 
 ## Server Side Rendering
 
