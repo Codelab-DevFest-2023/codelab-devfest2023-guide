@@ -55,7 +55,7 @@ Pour commencer, nous allons créer un écran affichant la liste des films. Nous 
 - Un composant `MoviesList` qui affiche la liste des films
 - Une route `/movies` associée au composant `MoviesList`
 
-Dans le répertoire `/src/hooks` du projet créons le fichier `useMovies.ts`. Ce hook s'appuie sur la librairie React Query pour gérer du cache.
+Dans le répertoire `/src/hooks` du projet, créons le fichier `useMovies.ts`. Ce hook s'appuie sur la librairie React Query pour gérer du cache.
 
 ```ts
 import { useQuery } from '@tanstack/react-query';
@@ -87,7 +87,7 @@ Ensuite nous allons créer un écran affichant le détail de chaque film. Nous a
 - Un composant `MovieDetailsPage` qui définit la page de détail d'un film
 - Une route `/movies/:id` qui définit des routes pour le
 
-Dans le répertoire `/src/hooks` du projet créons le fichier `useMovie.ts` avec le contenu suivant :
+Dans le répertoire `/src/hooks` du projet, créons le fichier `useMovie.ts` avec le contenu suivant :
 
 ```ts
 import { useQuery } from "@tanstack/react-query";
@@ -134,7 +134,7 @@ Dans cette deuxième partie, nous allons développer une application en Server S
 
 Nous allons créer un écran affichant la liste des films. Nous aurons besoin de créer la page d'affichage de la liste des films.
 
-Dans le répertoire `/src/pages/ssr` du projet modifions le fichier `index.tsx`.
+Dans le répertoire `/src/pages/ssr` du projet, modifions le fichier `index.tsx`.
 
 Nous allons utiliser la méthode `getServerSideProps` qui permet de récupérer des données côté serveur.
 Ici, la méthode `getServerSideProps` récupère des données l'API et les transmet en tant que propriété `movies` à la page `SSRPage`. Ces données sont disponibles côté serveur lors de la demande de la page.
@@ -316,7 +316,7 @@ import Head from 'next/head';
 
 Ensuite, nous allons créer un écran affichant le détail de chaque film. Nous aurons besoin de créer la page d'affichage des détails d'un film.
 
-Dans le répertoire `/src/pages/ssr` du projet modifions le fichier `[id].tsx`.
+Dans le répertoire `/src/pages/ssr` du projet, modifions le fichier `[id].tsx`.
 
 Nous allons réutiliser la méthode `getServerSideProps` pour récupérer les données concernant le film passé en paramètre.
 
@@ -540,7 +540,7 @@ Dans cette troisième partie, nous allons développer la même application que p
 
 Comme dans l'exercice précédent, nous aurons besoin de créer la page d'affichage de la liste des films.
 
-Dans le répertoire `/src/pages/ssg` du projet modifions le fichier `index.tsx`.
+Dans le répertoire `/src/pages/ssg` du projet, modifions le fichier `index.tsx`.
 
 Nous allons utiliser la méthode `getStaticProps` qui permet de générer des pages statiques lors de la construction de l'application, en précalculant les données à afficher sur ces pages.
 
@@ -610,7 +610,7 @@ Nous pouvons démarrer l'application avec la commande `npm run dev` et constater
 
 Ensuite, nous allons créer un écran affichant le détail de chaque film.
 
-Dans le répertoire `/src/pages/ssg` du projet modifions le fichier `[id].tsx`.
+Dans le répertoire `/src/pages/ssg` du projet, modifions le fichier `[id].tsx`.
 
 Nous allons réutiliser la méthode `getStaticProps` pour récupérer les données concernant le film passé en paramètre.
 
@@ -762,27 +762,227 @@ Ouvrons les devtools de Chrome (ou équivalent) pour observer :
 
 ## React Server Components
 
-Duration: 15:00
+Duration: 25:00
 
-<aside>Si vous n'avez pas eu le temps de finir l'étape précédente, vous pouvez faire un checkout de la branche "step5" pour débuter cette étape : <code>git checkout -f step5</code></aside>
+<aside>Si vous n'avez pas eu le temps de finir l'étape précédente, vous pouvez faire un checkout de la branche "ssg-end" pour débuter cette étape : <code>git checkout -f ssg-end</code></aside>
+
+Dans cette quatrième et dernière partie, nous allons développer la même application que précédement mais en utilisant les React Server Components, toujours en s'appuyant sur Next.js et Tailwind.
+
+<aside class="negative">Cet exercice utilisera le routage <strong>app</strong> (Next.js > 13).</aside>
 
 ### Liste des films
 
-TODO
+Comme dans l'exercice précédent, nous aurons besoin de créer la page d'affichage de la liste des films.
+
+Dans le répertoire `/src/app/rsc` du projet, modifions le fichier `page.tsx`.
+
+Nous n'avons plus besoin d'utiliser une méthode spécifique pour récupérer les données. nous pouvons directement faire un appel API dans notre composant serveur :
+
+```tsx
+import MovieCard from '@/components/movie/card/MovieCard';
+import SearchBox from '@/components/search/SearchBox';
+import { Movie } from '@/interfaces/movie.interface';
+import { fetchMovies } from '@/services/movie.service';
+
+export const revalidate = 0;
+
+interface Props {
+  searchParams: { [key: string]: string | string[] | undefined };
+}
+
+const RSCPage = async ({ searchParams }: Props) => {
+  const pathname = '/rsc';
+  const { results: movies } = await fetchMovies(searchParams);
+
+  return (
+    <main className="lg:mx-44 mx-4 space-y-4 lg:pt-6 pt-14 pb-20">
+      <SearchBox />
+      <ul className="movies-list grid xl:grid-cols-4 lg:grid-cols-3 sm:grid-cols-2 grid-cols-1 gap-6">
+        {movies?.map((movie: Movie) => (
+          <li key={movie.id}>
+            <MovieCard movie={movie} pathname={pathname} />
+          </li>
+        ))}
+      </ul>
+      {movies.length < 1 && (
+        <p className="font-medium text-3xl">Aucun résultat</p>
+      )}
+    </main>
+  );
+};
+
+export default RSCPage;
+```
+
+<aside>Le code <strong>export const revalidate = 0;</strong> est un mécanisme qui permet de mettre en cache les données générées côté serveur (SSR) pendant une période spécifiée.
+En mettant revalidate à zéro (0), cela signifie que les données seront générées à chaque demande sans mise en cache ni expiration.
+</aside>
+
+Nous pouvons démarrer l'application avec la commande `npm run dev` et constater que la liste des films s'affiche correctement à l'adresse `http://localhost:3000/rsc`.
 
 ### Détail d'un film
 
-TODO
+Ensuite, nous allons créer un écran affichant le détail de chaque film.
 
-### Recherche de films
+Dans le répertoire `/src/app/rsc/[id]` du projet, modifions le fichier `page.tsx`.
 
-TODO
+Comme précédement, nous pouvons directement faire un appel API dans notre composant serveur :
 
-### Gestion de favoris
+```tsx
+import Like from '@/components/like/Like';
+import Note from '@/components/note/Note';
+import { getMovieDetails } from '@/services/movie.service';
+import Image from 'next/image';
 
-TODO
+const RSCMovieDetailsPage = async ({ params }: { params: { id: number } }) => {
+  const movie = await getMovieDetails(params.id);
 
-### Affichage de la note
+  const posterUrl = `https://image.tmdb.org/t/p/w500/${movie.poster_path}`;
+  const backdropPathUrl = `https://image.tmdb.org/t/p/original/${movie.backdrop_path}`;
 
-TODO La note
+  return (
+    <main className="flex md:flex-row flex-col">
+      <div className="poster z-10 md:order-first order-last">
+        <Image
+          src={posterUrl}
+          alt={movie.title}
+          className="aspect-[2/3] object-cover h-full"
+          height={750}
+          width={500}
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+          priority
+        />
+      </div>
+      <div className="description relative w-full">
+        <Image
+          className="block z-0 object-cover brightness-50"
+          alt={movie.title}
+          src={backdropPathUrl}
+          fill
+          priority
+        />
+        <div className="relative flex flex-col">
+          <div className="flex flex-col gap-3 ml-4 text-white mt-3">
+            <h1 className="text-xl font-semibold">{movie.title}</h1>
+            <div className="flex gap-2">
+              {movie.genres.map((genre) => {
+                return <p key={genre.id}>{genre.name}</p>;
+              })}
+            </div>
+            <p>{movie.tagline}</p>
+            <p className="mt-2 mr-10">{movie.overview}</p>
+            <div className="flex items-center gap-3">
+              <Note note={movie.vote_average} />
+              <Like id={movie.id} />
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  );
+};
+
+export default RSCMovieDetailsPage;
+```
+
+### Affichage des critiques de films
+
+Afin de tirer partie de la force des React Server Components, nous allons afficher les critiques du film sur la page de détail.
+Nous allons :
+
+- Mettre en cache la requête de récupération du film (7 jours)
+- Ne pas mettre de cache sur la requête de récupération des critiques
+- Garder nos composants client
+
+Dans le répertoire `/src/services` du projet, modifions le fichier `movie.service.tsx`.
+
+Commençons par la méthode `getMovieDetails` en ajoutant `next: { revalidate: 604800 }`
+
+```tsx
+const getMovieDetails = async (movieId: number): Promise<Movie> => {
+  const queryParams = new URLSearchParams();
+  queryParams.append(QUERY_PARAMS.LANGUAGE, DEFAULT_PARAMS.LANGUAGE);
+
+  const URL = `${
+    process.env.NEXT_PUBLIC_API_URL
+  }/movie/${movieId}?${queryParams.toString()}`;
+
+  const result = await fetch(`${URL}`, {
+    headers: API_HEADER,
+    next: { revalidate: 604800 }, // 7 days
+  });
+  if (!result.ok) {
+    throw new Error('Failed to fetch trending movies data');
+  }
+
+  return result.json();
+};
+```
+
+Et la méthode `getMovieReviews` en ajoutant `cache: 'no-store'`
+
+```tsx
+const getMovieReviews = async (movieId: number): Promise<Review[]> => {
+  const URL = `${process.env.NEXT_PUBLIC_API_URL}/movie/${movieId}/reviews`;
+
+  const result = await fetch(`${URL}`, {
+    headers: API_HEADER,
+    cache: 'no-store',
+  });
+
+  if (!result.ok) {
+    throw new Error('Failed to get movie reviews');
+  }
+
+  const data: ReviewResponse = await result.json();
+  const reviews = data.results.slice(0, 3);
+
+  return reviews;
+};
+```
+
+Maintenant, nous pouvons rajouter la gestion des critiques sur notre page de détail :
+
+```tsx
+import Like from '@/components/like/Like';
+import MovieReview from '@/components/movie/review/MovieReview';
+import Note from '@/components/note/Note';
+import { Review } from '@/interfaces/review.interface';
+import { getMovieDetails, getMovieReviews } from '@/services/movie.service';
+import Image from 'next/image';
+
+const RSCMovieDetailsPage = async ({ params }: { params: { id: number } }) => {
+  const [movie, reviews] = await Promise.all([
+    getMovieDetails(params.id),
+    getMovieReviews(params.id),
+  ]);
+
+  const posterUrl = `https://image.tmdb.org/t/p/w500/${movie.poster_path}`;
+  const backdropPathUrl = `https://image.tmdb.org/t/p/original/${movie.backdrop_path}`;
+
+  return (
+    // ...
+    <div className="relative flex flex-col">
+      <div className="flex flex-col gap-3 ml-4 text-white mt-3">
+        {/*  ...  */}
+      </div>
+      <div className="grid lg:grid-cols-3 sm:grid-cols-2 grid-cols-1 gap-6 p-4">
+        {reviews.map((review: Review) => (
+          <MovieReview key={review.id} review={review} />
+        ))}
+      </div>
+    </div>
+    // ...
+  );
+};
+
+export default RSCMovieDetailsPage;
+```
+
+### Observons ce qui se passe
+
+Ouvrons les devtools de Chrome (ou équivalent) pour observer :
+
+- Les chargements de fichiers Javascript
+- Les appels de service REST
 
