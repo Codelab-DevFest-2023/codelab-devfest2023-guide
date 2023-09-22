@@ -201,6 +201,36 @@ const SSRPage = ({
 
 Nous pouvons démarrer l'application avec la commande `npm run dev` et constater que la liste des films s'affiche correctement à l'adresse `http://localhost:3000/ssr`.
 
+### Optimisations des images
+
+Afin d'optimiser l'affichage des images sur l'application. Nous allons utiliser le composant Image de Next.js.
+
+Le composant Image est conçu pour améliorer les performances et l'expérience utilisateur en matière de gestion des images, en simplifiant l'optimisation, le chargement asynchrone et l'adaptation des images aux besoins de l'utilisateur, tout en réduisant la charge de travail pour les développeurs.
+
+Il offre plusieurs avantages par rapport à l'utilisation d'une balise HTML `img` standard
+
+Dans le répertoire `/src/components/movie/card` du projet, ouvrons le fichier `MovieCard.tsx`.
+
+Remplaçons le composant `img` par un composant `Image` :
+
+```tsx
+import Image from 'next/image';
+
+// ...
+
+<Image
+  src={posterUrl}
+  alt={movie.title}
+  className="rounded-t-lg aspect-[2/3] object-cover"
+  height={750}
+  width={500}
+  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+  priority
+/>;
+
+// ...
+```
+
 ### Recherche de films
 
 Nous allons créer un composant qui nous permettra de rechercher un film.

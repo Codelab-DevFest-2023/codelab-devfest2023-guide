@@ -181,6 +181,28 @@ const SSRPage = ({
 // ...
 </code></pre>
 <p>Nous pouvons démarrer l&#39;application avec la commande <code>npm run dev</code> et constater que la liste des films s&#39;affiche correctement à l&#39;adresse <code>http://localhost:3000/ssr</code>.</p>
+<h2 is-upgraded>Optimisations des images</h2>
+<p>Afin d&#39;optimiser l&#39;affichage des images sur l&#39;application. Nous allons utiliser le composant Image de Next.js.</p>
+<p>Le composant Image est conçu pour améliorer les performances et l&#39;expérience utilisateur en matière de gestion des images, en simplifiant l&#39;optimisation, le chargement asynchrone et l&#39;adaptation des images aux besoins de l&#39;utilisateur, tout en réduisant la charge de travail pour les développeurs.</p>
+<p>Il offre plusieurs avantages par rapport à l&#39;utilisation d&#39;une balise HTML <code>img</code> standard</p>
+<p>Dans le répertoire <code>/src/components/movie/card</code> du projet, ouvrons le fichier <code>MovieCard.tsx</code>.</p>
+<p>Remplaçons le composant <code>img</code> par un composant <code>Image</code> :</p>
+<pre><code language="language-tsx" class="language-tsx">import Image from &#39;next/image&#39;;
+
+// ...
+
+&lt;Image
+  src={posterUrl}
+  alt={movie.title}
+  className=&#34;rounded-t-lg aspect-[2/3] object-cover&#34;
+  height={750}
+  width={500}
+  sizes=&#34;(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw&#34;
+  priority
+/&gt;;
+
+// ...
+</code></pre>
 <h2 is-upgraded>Recherche de films</h2>
 <p>Nous allons créer un composant qui nous permettra de rechercher un film. Dans le cas d&#39;une recherche côté serveur, la recherche de l&#39;utilisateur sera envoyé dans l&#39;url de la page en paramètre <code>http://localhost:3000/ssr?query=xxxx</code>.</p>
 <p>Dans le répertoire <code>/src/components/search</code> du projet, ouvrons le fichier <code>SearchBox.tsx</code>.</p>
