@@ -52,64 +52,265 @@ Dans cette première partie, nous allons développer une application en Client S
 Pour commencer, nous allons créer un écran affichant la liste des films. Nous avons donc besoin de créer :
 
 - Un hook `useMovies` qui permet de charger la liste des films
-- Un composant `MoviesList` qui affiche la liste des films
-- Une route `/movies` associée au composant `MoviesList`
+- Une page `MoviesPage` qui affiche la liste des films
+- Une route `/movies` associée au composant `MoviesPage`
 
-Dans le répertoire `/src/hooks` du projet, créons le fichier `useMovies.ts`. Ce hook s'appuie sur la librairie React Query pour gérer du cache.
+Dans le répertoire `/src/hooks` du projet, créons le fichier `movie.hook.ts`. Ce hook s'appuie sur la librairie React Query pour gérer du cache.
 
 ```ts
 import { useQuery } from '@tanstack/react-query';
+import { AxiosError } from 'axios';
+import { Movie } from '../interfaces/movie.interface';
+import { getMovies } from '../services/movie.service';
 
-export default useMovies = () => {
-  return useQuery({});
+const useMovies = () => {
+  return useQuery<Movie[], AxiosError>(['MOVIES'], () => getMovies());
 };
+
+export { useMovies };
 ```
 
-Puis dans le répertoire `/src/pages` nous allons créer le fichier `MoviesListPage.tsx` qui utilise le hook `useMovies` pour récupérer les films puis parcourt les films pour afficher une card pour chaque film. Un loader est affiché pendant le chargement des films.
+Puis dans le répertoire `/src/pages` nous allons créer le fichier `MoviesPage.tsx` qui utilise le hook `useMovies` pour récupérer les films puis parcourt les films pour afficher une card pour chaque film. Un loader est affiché pendant le chargement des films.
 
 ```ts
-TODO;
+import MovieCard from '../../components/movie/card/MovieCard';
+import { useMovies } from '../../hooks/movie.hook';
+import { Movie } from '../../interfaces/movie.interface';
+
+const MoviesPage = () => {
+  const { data: movies, isFetching, isError, refetch } = useMovies();
+
+  return (
+    <div className="lg:mx-44 mx-4 space-y-4 lg:pt-6 pt-14 pb-20">
+      {isError && (
+        <div>
+          <p className="text-red mb-4">
+            Erreur lors de la récupération des films ...
+          </p>
+          <button type="button" onClick={() => refetch()}>
+            Réssayer
+          </button>
+        </div>
+      )}
+      {isFetching && <p>Chargement...</p>}
+      <ul className="movies-list grid xl:grid-cols-4 lg:grid-cols-3 sm:grid-cols-2 grid-cols-1 gap-6">
+        {!isFetching &&
+          !isError &&
+          movies?.map((movie: Movie) => (
+            <li key={movie.id}>
+              <MovieCard movie={movie} />
+            </li>
+          ))}
+      </ul>
+      {movies && movies.length < 1 && (
+        <p className="font-medium text-3xl">Aucun résultat</p>
+      )}
+    </div>
+  );
+};
+
+export default MoviesPage;
 ```
 
-Enfin nous allons créer une route `/movies` dans le fichier `/src/router.ts`. Cette route est associée au composant `MoviesListPage`.
+Enfin nous allons créer une route `/movies` dans le fichier `/src/App.tsx`.
 
 ```ts
-TODO;
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import Layout from './components/layout/Layout';
+import MoviesPage from './pages/movies/MoviesPage';
+import HomePage from './pages/home/HomePage';
+
+const App = () => {
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Layout />}>
+          <Route index element={<HomePage />} />
+          <Route path="movies" element={<MoviesPage />} />
+        </Route>
+      </Routes>
+    </BrowserRouter>
+  );
+};
+
+export default App;
 ```
 
-Nous pouvons démarrer l'application avec la commande `npm run dev` et constater que la liste des films s'affiche correctement.
+Il ne reste plus qu'a rajouter un accès vers notre nouvelle route dans le fichier `/src/components/header/Header.tsx`
+
+```ts
+import popcornLogo from '../../assets/popcorn.jpg';
+
+const Header = () => {
+  return (
+    <nav className="w-full bg-primary z-50 fixed top-0 left-0 right-0">
+      <div className="flex items-center bg-primary lg:mx-44 lg:justify-between lg:py-5  lg:gap-0 gap-6 mx-4 py-2">
+        <a href="/" className="flex gap-4 items-center -m-1.5 p-1.5">
+          <img src={popcornLogo} alt="Logo popcorn" width={40} height={40} />
+          <span className="hidden sm:block text-white font-semibold leading-6 xl:text-lg text-base">
+            Rendu front, action !
+          </span>
+        </a>
+
+        <ul className="text-white grid lg:grid-cols-3 sm:grid-cols-2 grid-cols-1 gap-4">
+          <li>
+            <a
+              href="/movies"
+              className="flex items-center gap-2 font-semibold leading-6 xl:text-lg text-base"
+            >
+              Les des films
+            </a>
+          </li>
+        </ul>
+
+        <img
+          className="lg:block hidden"
+          src={popcornLogo}
+          alt="Logo popcorn"
+          width={40}
+          height={40}
+        />
+      </div>
+    </nav>
+  );
+};
+
+export default Header;
+```
+
+Nous pouvons démarrer l'application avec la commande `npm run dev` et constater que la liste des films s'affiche correctement `http://localhost:5173/movies`.
 
 ### Détail d'un film
 
 Ensuite nous allons créer un écran affichant le détail de chaque film. Nous avons besoin de créer :
 
 - Un hook `useMovie` qui permet de charger le détail du film
-- Un composant `MovieDetailsPage` qui définit la page de détail d'un film
+- Un composant `MoviePage` qui définit la page de détail d'un film
 - Une route `/movies/:id` qui définit des routes pour le
 
-Dans le répertoire `/src/hooks` du projet, créons le fichier `useMovie.ts` avec le contenu suivant :
+Dans le répertoire `/src/hooks` du projet, modifions le fichier `movie.hook.ts`. avec le contenu suivant :
 
 ```ts
-import { useQuery } from "@tanstack/react-query";
+import { useQuery } from '@tanstack/react-query';
+import { AxiosError } from 'axios';
+import { Movie } from '../interfaces/movie.interface';
+import { getMovieDetails, getMovies } from '../services/movie.service';
 
-export default useMovie = () => {
-  return useQuery({...});
+// ...
+
+const useMovie = (movieId: number) => {
+  return useQuery<Movie, AxiosError>([`MOVIE-${movieId}`], () =>
+    getMovieDetails(movieId)
+  );
 };
+
+export { useMovie, useMovies };
 ```
 
-Puis dans le répertoire `/src/pages` nous allons créer le fichier `MovieDetailsPage.tsx` qui utilise le hook `useMovie` pour récupérer le détail du film puis afficher les informations. Un loader est affiché pendant le chargement du film.
+Puis dans le répertoire `/src/pages` nous allons créer le fichier `MoviePage.tsx` qui utilise le hook `useMovie` pour récupérer le détail du film puis afficher les informations. Un loader est affiché pendant le chargement du film.
 
 ```ts
-TODO;
+import { useParams } from 'react-router-dom';
+import { useMovie } from '../../hooks/movie.hook';
+import Like from '../../components/like/Like';
+import Note from '../../components/note/Note';
+
+const MoviePage = () => {
+  const { movieId } = useParams();
+  const {
+    data: movie,
+    isFetching,
+    isError,
+    refetch,
+  } = useMovie(Number(movieId));
+
+  const posterUrl = `https://image.tmdb.org/t/p/w500/${movie?.poster_path}`;
+  const backdropPathUrl = `https://image.tmdb.org/t/p/original/${movie?.backdrop_path}`;
+
+  return (
+    <div className="flex md:flex-row flex-col">
+      {isError && (
+        <div>
+          <p className="text-red mb-4">
+            Erreur lors de la récupération du film ...
+          </p>
+          <button type="button" onClick={() => refetch()}>
+            Réssayer
+          </button>
+        </div>
+      )}
+      {isFetching && <p>Chargement...</p>}
+      {movie && (
+        <>
+          <div className="poster z-10 md:order-first order-last">
+            <img
+              src={posterUrl}
+              alt={movie.title}
+              className="aspect-[2/3] object-cover h-full"
+              height={750}
+              width={500}
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            />
+          </div>
+          <div className="description relative w-full">
+            <img
+              className="absolute z-0 object-cover h-full w-[inherit] brightness-50"
+              alt={movie.title}
+              src={backdropPathUrl}
+            />
+            <div className="relative flex flex-col">
+              <div className="flex flex-col gap-3 ml-4 text-white mt-3">
+                <h1 className="text-xl font-semibold">{movie.title}</h1>
+                <div className="flex gap-2">
+                  {movie.genres.map((genre) => {
+                    return <p key={genre.id}>{genre.name}</p>;
+                  })}
+                </div>
+                <p>{movie.tagline}</p>
+                <p className="mt-2 mr-10">{movie.overview}</p>
+                <div className="flex items-center gap-3">
+                  <Note note={movie.vote_average} />
+                  <Like id={movie.id} />
+                </div>
+              </div>
+            </div>
+          </div>
+        </>
+      )}
+    </div>
+  );
+};
+
+export default MoviePage;
 ```
 
-Enfin nous allons créer une route `/movies/:id` dans le fichier `/src/router.ts`. Cette route est associée au composant `MovieDetailsPage`.
+Enfin nous allons créer une route `/movies/:id` dans le fichier `/src/App.tsx`.
 
 ```ts
-TODO;
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import Layout from './components/layout/Layout';
+import MoviePage from './pages/movie/MoviePage';
+import MoviesPage from './pages/movies/MoviesPage';
+import HomePage from './pages/home/HomePage';
+
+const App = () => {
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Layout />}>
+          <Route index element={<HomePage />} />
+          <Route path="movies" element={<MoviesPage />} />
+          <Route path="movie/:movieId" element={<MoviePage />} />
+        </Route>
+      </Routes>
+    </BrowserRouter>
+  );
+};
+
+export default App;
 ```
 
-Nous pouvons démarrer l'application avec la commande `npm run dev` et constater que la liste des films s'affiche correctement.
+Nous pouvons démarrer l'application avec la commande `npm run dev`, cliquer sur un film afin d'accéder à la nouvelle page de détail.
 
 ### Analysons cette application
 
@@ -672,7 +873,7 @@ export default SSGMovieDetailsPage;
 
 Nous devons aussi utiliser la méthode `getStaticPaths` afin de générer les chemins (URL) pour les pages dynamiques lors de la génération statique.
 
-<aside><strong>getStaticPath</strong> est souvent utilisée avec <strong>getStaticProps</strong> pour générer des pages dynamiques précalculées, où les chemins sont basés sur des données provenant d'une source externe, comme une API ou une base de données.</aside>
+<aside><strong>getStaticPaths</strong> est souvent utilisée avec <strong>getStaticProps</strong> pour générer des pages dynamiques précalculées, où les chemins sont basés sur des données provenant d'une source externe, comme une API ou une base de données.</aside>
 
 ```tsx
 import { Movie } from '@/interfaces/movie.interface';
