@@ -20,9 +20,8 @@
   </style>
 </head>
 <body>
-  <google-codelab-analytics gaid="UA-49880327-14" ga4id=""></google-codelab-analytics>
+  <google-codelab-analytics gaid="UA-49880327-14"></google-codelab-analytics>
   <google-codelab codelab-gaid=""
-                  codelab-ga4id=""
                   id="docs"
                   title="Rendu front, action ! Découvrez les différents modes de rendu avec Next.js"
                   environment="web"
@@ -42,12 +41,12 @@
 <li>L&#39;un qui servira pour l&#39;exercice sur le client side rendering</li>
 <li>L&#39;autre servira pour les exercices suivants basés sur Next.js</li>
 </ul>
-<p>Installer le projet pour l&#39;exercice sur le client side rendering, en se positionnant sur la branche <code>start</code> :</p>
+<p>Cloner le projet pour l&#39;exercice sur le client side rendering, en se positionnant sur la branche <code>start</code> :</p>
 <pre><code language="language-bash" class="language-bash">git clone --branch start https://github.com/Codelab-DevFest-2023/codelab-devfest2023-csr.git
 cd codelab-devfest2023-csr
 npm install
 </code></pre>
-<p>Lancer la commande <code>npm run dev</code> et vérifier qu&#39;on a bien une application qui s&#39;affiche sur l&#39;url <code>http://localhost:3000</code>.</p>
+<p>Lancer la commande <code>npm run dev</code> et vérifier qu&#39;on a bien une application qui s&#39;affiche sur l&#39;url <code>http://localhost:5173</code>.</p>
 <p>Puis installer le projet pour les exercices avec Next.js :</p>
 <pre><code language="language-bash" class="language-bash">git clone --branch start https://github.com/Codelab-DevFest-2023/codelab-devfest2023-next.git
 cd codelab-devfest2023-next
@@ -60,8 +59,22 @@ npm install
     
       <google-codelab-step label="Client Side Rendering" duration="20">
         <p>Dans cette première partie, nous allons développer une application en Client Side Rendering s&#39;appuyant sur Vite.js, React et Tailwind. Nous n&#39;utiliserons donc pas Next.js dans cet exercice, mais il permettra de se rendre compte des différences entre le client side rendering et les autres modes de rendu que nous verrons plus tard.</p>
-<aside class="special"><p>Pour se concentrer sur ce qui est spécifique au client side rendering, certains composants vous sont déjà fournis dans le repository : carte d&#39;un film, méthodes de fetch, composant de layout, etc...</p>
+<p>Pour cette partie nous travaillerons dans le répertoire <code>codelab-devfest2023-csr</code>.</p>
+<aside class="special"><p>Pour se concentrer sur ce qui est spécifique au client side rendering, certains éléments sont déjà fournis dans le repository : carte d&#39;un film, méthodes de fetch des données, composant de layout, etc...</p>
 </aside>
+<h2 is-upgraded>Création d&#39;un fichier d&#39;environnement</h2>
+<p>Pour pouvoir utiliser l&#39;API TMDB nous devons fournir une clé d&#39;API dans un fichier <code>.env</code>. Créer ce fichier <code>.env</code> à la racine du projet avec le contenu suivant :</p>
+<pre><code>VITE_API_URL=https://api.themoviedb.org/3
+VITE_API_KEY=eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIyZmMxMDQ0YjI0ZDdkYjcyY2RlZmJmNTBkNTkyNzhiYyIsInN1YiI6IjY0YzU2ZTgyNjNhNjk1MDEwMzk5Y2I0YiIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.Rc42SZEbnqH6PvJRj1GAVYTADLcR5vNzArE1P333_dI
+</code></pre>
+<p>En utilisant une clé d&#39;API parmi celles-ci :</p>
+<ul>
+<li><code>eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIyZmMxMDQ0YjI0ZDdkYjcyY2RlZmJmNTBkNTkyNzhiYyIsInN1YiI6IjY0YzU2ZTgyNjNhNjk1MDEwMzk5Y2I0YiIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.Rc42SZEbnqH6PvJRj1GAVYTADLcR5vNzArE1P333_dI</code></li>
+<li>clé 2</li>
+<li>clé 3</li>
+<li>clé 4</li>
+<li>clé 5</li>
+</ul>
 <h2 is-upgraded>Liste des films</h2>
 <p>Pour commencer, nous allons créer un écran affichant la liste des films. Nous avons donc besoin de créer :</p>
 <ul>
@@ -69,26 +82,35 @@ npm install
 <li>Une page <code>MoviesPage</code> qui affiche la liste des films</li>
 <li>Une route <code>/movies</code> associée au composant <code>MoviesPage</code></li>
 </ul>
-<p>Dans le répertoire <code>/src/hooks</code> du projet, créons le fichier <code>movie.hook.ts</code>. Ce hook s&#39;appuie sur la librairie React Query pour gérer du cache.</p>
+<p>Dans le répertoire <code>/src/hooks</code> du projet, créons le fichier <code>movies.ts</code> et ajoutons y le hook <code>useMovies</code>. Ce hook s&#39;appuie sur la librairie React Query pour gérer du cache.</p>
 <pre><code language="language-ts" class="language-ts">import { useQuery } from &#39;@tanstack/react-query&#39;;
 import { AxiosError } from &#39;axios&#39;;
 import { Movie } from &#39;../interfaces/movie.interface&#39;;
 import { getMovies } from &#39;../services/movie.service&#39;;
 
 const useMovies = () =&gt; {
-  return useQuery&lt;Movie[], AxiosError&gt;([&#39;MOVIES&#39;], () =&gt; getMovies());
+  return useQuery&lt;Movie[], AxiosError&gt;({
+    queryKey: [&#39;movies&#39;],
+    queryFn: () =&gt; getMovies(),
+  });
 };
 
 export { useMovies };
 </code></pre>
-<p>Puis dans le répertoire <code>/src/pages</code> nous allons créer le fichier <code>MoviesPage.tsx</code> qui utilise le hook <code>useMovies</code> pour récupérer les films puis parcourt les films pour afficher une card pour chaque film. Un loader est affiché pendant le chargement des films.</p>
+<p>Puis dans le répertoire <code>/src/pages</code> nous allons modifier le fichier <code>MoviesPage.tsx</code> :</p>
+<ul>
+<li>Appel du hook <code>useMovies</code> pour récupérer les films (ce hook s&#39;appuie sur la librairie React Query)</li>
+<li>Affichage de <code>Chargement ...</code> pendant le chargement des données</li>
+<li>Affichage d&#39;un message d&#39;erreur et d&#39;un bouton <code>Réessayer</code></li>
+<li>Affichage d&#39;une carte pour chaque film chargé</li>
+<li>Affichage d&#39;un message dans le cas où on n&#39;a aucun film</li>
+</ul>
+<p>Le composant doit ressembler à ça :</p>
 <pre><code language="language-ts" class="language-ts">import MovieCard from &#39;../../components/movie/card/MovieCard&#39;;
-import { useMovies } from &#39;../../hooks/movie.hook&#39;;
-import { Movie } from &#39;../../interfaces/movie.interface&#39;;
+import { useMovies } from &#39;../../hooks/movies&#39;;
 
 const MoviesPage = () =&gt; {
-  const { data: movies, isFetching, isError, refetch } = useMovies();
-
+  const { data: movies, isFetching, isError, isFetched, refetch } = useMovies();
   return (
     &lt;div className=&#34;lg:mx-44 mx-4 space-y-4 lg:pt-6 pt-14 pb-20&#34;&gt;
       {isError &amp;&amp; (
@@ -96,22 +118,28 @@ const MoviesPage = () =&gt; {
           &lt;p className=&#34;text-red mb-4&#34;&gt;
             Erreur lors de la récupération des films ...
           &lt;/p&gt;
-          &lt;button type=&#34;button&#34; onClick={() =&gt; refetch()}&gt;
-            Réssayer
+          &lt;button
+            type=&#34;button&#34;
+            onClick={() =&gt; {
+              refetch();
+            }}
+          &gt;
+            Réessayer
           &lt;/button&gt;
         &lt;/div&gt;
       )}
       {isFetching &amp;&amp; &lt;p&gt;Chargement...&lt;/p&gt;}
-      &lt;ul className=&#34;movies-list grid xl:grid-cols-4 lg:grid-cols-3 sm:grid-cols-2 grid-cols-1 gap-6&#34;&gt;
-        {!isFetching &amp;&amp;
-          !isError &amp;&amp;
-          movies?.map((movie: Movie) =&gt; (
+      {
+        isFetched &amp;&amp; movies &amp;&amp; movies?.length &gt; 0 &amp;&amp; (
+        &lt;ul className=&#34;movies-list grid xl:grid-cols-4 lg:grid-cols-3 sm:grid-cols-2 grid-cols-1 gap-6&#34;&gt;
+          {movies.map((movie) =&gt; (
             &lt;li key={movie.id}&gt;
               &lt;MovieCard movie={movie} /&gt;
             &lt;/li&gt;
           ))}
-      &lt;/ul&gt;
-      {movies &amp;&amp; movies.length &lt; 1 &amp;&amp; (
+        &lt;/ul&gt;
+      )}
+      {isFetched &amp;&amp; movies &amp;&amp; movies.length &lt; 1 &amp;&amp; (
         &lt;p className=&#34;font-medium text-3xl&#34;&gt;Aucun résultat&lt;/p&gt;
       )}
     &lt;/div&gt;
@@ -120,7 +148,7 @@ const MoviesPage = () =&gt; {
 
 export default MoviesPage;
 </code></pre>
-<p>Enfin nous allons créer une route <code>/movies</code> dans le fichier <code>/src/App.tsx</code>.</p>
+<p>Enfin nous allons ajouter une route <code>/movies</code> dans le fichier <code>/src/App.tsx</code> et l&#39;associer au composant <code>MoviesPage</code> comme ci-dessous.</p>
 <pre><code language="language-ts" class="language-ts">import { BrowserRouter, Route, Routes } from &#39;react-router-dom&#39;;
 import Layout from &#39;./components/layout/Layout&#39;;
 import MoviesPage from &#39;./pages/movies/MoviesPage&#39;;
@@ -161,7 +189,7 @@ const Header = () =&gt; {
               href=&#34;/movies&#34;
               className=&#34;flex items-center gap-2 font-semibold leading-6 xl:text-lg text-base&#34;
             &gt;
-              Les des films
+              Liste des films
             &lt;/a&gt;
           &lt;/li&gt;
         &lt;/ul&gt;
@@ -197,16 +225,22 @@ import { getMovieDetails, getMovies } from &#39;../services/movie.service&#39;;
 // ...
 
 const useMovie = (movieId: number) =&gt; {
-  return useQuery&lt;Movie, AxiosError&gt;([`MOVIE-${movieId}`], () =&gt;
-    getMovieDetails(movieId)
-  );
+  return useQuery&lt;Movie, AxiosError&gt;({
+    queryKey: [&#39;movies&#39;, movieId],
+    queryFn: () =&gt; getMovieDetails(movieId),
+  });
 };
 
 export { useMovie, useMovies };
 </code></pre>
-<p>Puis dans le répertoire <code>/src/pages</code> nous allons créer le fichier <code>MoviePage.tsx</code> qui utilise le hook <code>useMovie</code> pour récupérer le détail du film puis afficher les informations. Un loader est affiché pendant le chargement du film.</p>
+<p>Puis dans le répertoire <code>/src/pages</code> nous allons modifier le fichier <code>MoviePage.tsx</code> :</p>
+<ul>
+<li>Utilisation du hook <code>useMovie</code> pour récupérer le détail du film (le hook utilise React Query)</li>
+<li>Utilisation des statuts et méthodes retournés par React Query pour gérer un message de chargement et gérer les erreurs de chargement</li>
+<li>Affichage des informations sur le film</li>
+</ul>
 <pre><code language="language-ts" class="language-ts">import { useParams } from &#39;react-router-dom&#39;;
-import { useMovie } from &#39;../../hooks/movie.hook&#39;;
+import { useMovie } from &#39;../../hooks/movies&#39;;
 import Like from &#39;../../components/like/Like&#39;;
 import Note from &#39;../../components/note/Note&#39;;
 
@@ -216,6 +250,7 @@ const MoviePage = () =&gt; {
     data: movie,
     isFetching,
     isError,
+    isFetched,
     refetch,
   } = useMovie(Number(movieId));
 
@@ -230,12 +265,12 @@ const MoviePage = () =&gt; {
             Erreur lors de la récupération du film ...
           &lt;/p&gt;
           &lt;button type=&#34;button&#34; onClick={() =&gt; refetch()}&gt;
-            Réssayer
+            Réessayer
           &lt;/button&gt;
         &lt;/div&gt;
       )}
       {isFetching &amp;&amp; &lt;p&gt;Chargement...&lt;/p&gt;}
-      {movie &amp;&amp; (
+      {isFetched &amp;&amp; movie &amp;&amp; (
         &lt;&gt;
           &lt;div className=&#34;poster z-10 md:order-first order-last&#34;&gt;
             &lt;img
@@ -795,7 +830,7 @@ export const getStaticProps: GetStaticProps&lt;{
 export default SSGMovieDetailsPage;
 </code></pre>
 <p>Nous devons aussi utiliser la méthode <code>getStaticPaths</code> afin de générer les chemins (URL) pour les pages dynamiques lors de la génération statique.</p>
-<aside class="special"><p><strong>getStaticPath</strong> est souvent utilisée avec <strong>getStaticProps</strong> pour générer des pages dynamiques précalculées, où les chemins sont basés sur des données provenant d&#39;une source externe, comme une API ou une base de données.</p>
+<aside class="special"><p><strong>getStaticPaths</strong> est souvent utilisée avec <strong>getStaticProps</strong> pour générer des pages dynamiques précalculées, où les chemins sont basés sur des données provenant d&#39;une source externe, comme une API ou une base de données.</p>
 </aside>
 <pre><code language="language-tsx" class="language-tsx">import { Movie } from &#39;@/interfaces/movie.interface&#39;;
 import { getMovieDetails, getMovies } from &#39;@/services/movie.service&#39;;

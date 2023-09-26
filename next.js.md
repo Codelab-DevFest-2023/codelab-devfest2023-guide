@@ -19,7 +19,7 @@ Pour ce codelab nous utiliserons deux repositories :
 - L'un qui servira pour l'exercice sur le client side rendering
 - L'autre servira pour les exercices suivants basés sur Next.js
 
-Installer le projet pour l'exercice sur le client side rendering, en se positionnant sur la branche `start` :
+Cloner le projet pour l'exercice sur le client side rendering, en se positionnant sur la branche `start` :
 
 ```bash
 git clone --branch start https://github.com/Codelab-DevFest-2023/codelab-devfest2023-csr.git
@@ -27,7 +27,7 @@ cd codelab-devfest2023-csr
 npm install
 ```
 
-Lancer la commande `npm run dev` et vérifier qu'on a bien une application qui s'affiche sur l'url `http://localhost:3000`.
+Lancer la commande `npm run dev` et vérifier qu'on a bien une application qui s'affiche sur l'url `http://localhost:5173`.
 
 Puis installer le projet pour les exercices avec Next.js :
 
@@ -45,7 +45,25 @@ Duration: 20:00
 
 Dans cette première partie, nous allons développer une application en Client Side Rendering s'appuyant sur Vite.js, React et Tailwind. Nous n'utiliserons donc pas Next.js dans cet exercice, mais il permettra de se rendre compte des différences entre le client side rendering et les autres modes de rendu que nous verrons plus tard.
 
-<aside>Pour se concentrer sur ce qui est spécifique au client side rendering, certains composants vous sont déjà fournis dans le repository : carte d'un film, méthodes de fetch, composant de layout, etc...</aside>
+Pour cette partie nous travaillerons dans le répertoire `codelab-devfest2023-csr`.
+
+<aside>Pour se concentrer sur ce qui est spécifique au client side rendering, certains éléments sont déjà fournis dans le repository : carte d'un film, méthodes de fetch des données, composant de layout, etc...</aside>
+
+### Création d'un fichier d'environnement
+
+Pour pouvoir utiliser l'API TMDB nous devons fournir une clé d'API dans un fichier `.env`. Créer ce fichier `.env` à la racine du projet avec le contenu suivant :
+
+```
+VITE_API_URL=https://api.themoviedb.org/3
+VITE_API_KEY=eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIyZmMxMDQ0YjI0ZDdkYjcyY2RlZmJmNTBkNTkyNzhiYyIsInN1YiI6IjY0YzU2ZTgyNjNhNjk1MDEwMzk5Y2I0YiIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.Rc42SZEbnqH6PvJRj1GAVYTADLcR5vNzArE1P333_dI
+```
+
+En utilisant une clé d'API parmi celles-ci :
+- `eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIyZmMxMDQ0YjI0ZDdkYjcyY2RlZmJmNTBkNTkyNzhiYyIsInN1YiI6IjY0YzU2ZTgyNjNhNjk1MDEwMzk5Y2I0YiIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.Rc42SZEbnqH6PvJRj1GAVYTADLcR5vNzArE1P333_dI`
+- clé 2
+- clé 3
+- clé 4
+- clé 5
 
 ### Liste des films
 
@@ -55,7 +73,7 @@ Pour commencer, nous allons créer un écran affichant la liste des films. Nous 
 - Une page `MoviesPage` qui affiche la liste des films
 - Une route `/movies` associée au composant `MoviesPage`
 
-Dans le répertoire `/src/hooks` du projet, créons le fichier `movie.hook.ts`. Ce hook s'appuie sur la librairie React Query pour gérer du cache.
+Dans le répertoire `/src/hooks` du projet, créons le fichier `movies.ts` et ajoutons y le hook `useMovies`. Ce hook s'appuie sur la librairie React Query pour gérer du cache.
 
 ```ts
 import { useQuery } from '@tanstack/react-query';
@@ -64,22 +82,30 @@ import { Movie } from '../interfaces/movie.interface';
 import { getMovies } from '../services/movie.service';
 
 const useMovies = () => {
-  return useQuery<Movie[], AxiosError>(['MOVIES'], () => getMovies());
+  return useQuery<Movie[], AxiosError>({
+    queryKey: ['movies'],
+    queryFn: () => getMovies(),
+  });
 };
 
 export { useMovies };
 ```
 
-Puis dans le répertoire `/src/pages` nous allons créer le fichier `MoviesPage.tsx` qui utilise le hook `useMovies` pour récupérer les films puis parcourt les films pour afficher une card pour chaque film. Un loader est affiché pendant le chargement des films.
+Puis dans le répertoire `/src/pages` nous allons modifier le fichier `MoviesPage.tsx` :
+- Appel du hook `useMovies` pour récupérer les films (ce hook s'appuie sur la librairie React Query)
+- Affichage de `Chargement ...` pendant le chargement des données
+- Affichage d'un message d'erreur et d'un bouton `Réessayer`
+- Affichage d'une carte pour chaque film chargé
+- Affichage d'un message dans le cas où on n'a aucun film
+
+Le composant doit ressembler à ça :
 
 ```ts
 import MovieCard from '../../components/movie/card/MovieCard';
-import { useMovies } from '../../hooks/movie.hook';
-import { Movie } from '../../interfaces/movie.interface';
+import { useMovies } from '../../hooks/movies';
 
 const MoviesPage = () => {
-  const { data: movies, isFetching, isError, refetch } = useMovies();
-
+  const { data: movies, isFetching, isError, isFetched, refetch } = useMovies();
   return (
     <div className="lg:mx-44 mx-4 space-y-4 lg:pt-6 pt-14 pb-20">
       {isError && (
@@ -87,22 +113,28 @@ const MoviesPage = () => {
           <p className="text-red mb-4">
             Erreur lors de la récupération des films ...
           </p>
-          <button type="button" onClick={() => refetch()}>
-            Réssayer
+          <button
+            type="button"
+            onClick={() => {
+              refetch();
+            }}
+          >
+            Réessayer
           </button>
         </div>
       )}
       {isFetching && <p>Chargement...</p>}
-      <ul className="movies-list grid xl:grid-cols-4 lg:grid-cols-3 sm:grid-cols-2 grid-cols-1 gap-6">
-        {!isFetching &&
-          !isError &&
-          movies?.map((movie: Movie) => (
+      {
+        isFetched && movies && movies?.length > 0 && (
+        <ul className="movies-list grid xl:grid-cols-4 lg:grid-cols-3 sm:grid-cols-2 grid-cols-1 gap-6">
+          {movies.map((movie) => (
             <li key={movie.id}>
               <MovieCard movie={movie} />
             </li>
           ))}
-      </ul>
-      {movies && movies.length < 1 && (
+        </ul>
+      )}
+      {isFetched && movies && movies.length < 1 && (
         <p className="font-medium text-3xl">Aucun résultat</p>
       )}
     </div>
@@ -112,7 +144,7 @@ const MoviesPage = () => {
 export default MoviesPage;
 ```
 
-Enfin nous allons créer une route `/movies` dans le fichier `/src/App.tsx`.
+Enfin nous allons ajouter une route `/movies` dans le fichier `/src/App.tsx` et l'associer au composant `MoviesPage` comme ci-dessous.
 
 ```ts
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
@@ -158,7 +190,7 @@ const Header = () => {
               href="/movies"
               className="flex items-center gap-2 font-semibold leading-6 xl:text-lg text-base"
             >
-              Les des films
+              Liste des films
             </a>
           </li>
         </ul>
@@ -199,19 +231,23 @@ import { getMovieDetails, getMovies } from '../services/movie.service';
 // ...
 
 const useMovie = (movieId: number) => {
-  return useQuery<Movie, AxiosError>([`MOVIE-${movieId}`], () =>
-    getMovieDetails(movieId)
-  );
+  return useQuery<Movie, AxiosError>({
+    queryKey: ['movies', movieId],
+    queryFn: () => getMovieDetails(movieId),
+  });
 };
 
 export { useMovie, useMovies };
 ```
 
-Puis dans le répertoire `/src/pages` nous allons créer le fichier `MoviePage.tsx` qui utilise le hook `useMovie` pour récupérer le détail du film puis afficher les informations. Un loader est affiché pendant le chargement du film.
+Puis dans le répertoire `/src/pages` nous allons modifier le fichier `MoviePage.tsx` :
+- Utilisation du hook `useMovie` pour récupérer le détail du film (le hook utilise React Query)
+- Utilisation des statuts et méthodes retournés par React Query pour gérer un message de chargement et gérer les erreurs de chargement
+- Affichage des informations sur le film
 
 ```ts
 import { useParams } from 'react-router-dom';
-import { useMovie } from '../../hooks/movie.hook';
+import { useMovie } from '../../hooks/movies';
 import Like from '../../components/like/Like';
 import Note from '../../components/note/Note';
 
@@ -221,6 +257,7 @@ const MoviePage = () => {
     data: movie,
     isFetching,
     isError,
+    isFetched,
     refetch,
   } = useMovie(Number(movieId));
 
@@ -235,12 +272,12 @@ const MoviePage = () => {
             Erreur lors de la récupération du film ...
           </p>
           <button type="button" onClick={() => refetch()}>
-            Réssayer
+            Réessayer
           </button>
         </div>
       )}
       {isFetching && <p>Chargement...</p>}
-      {movie && (
+      {isFetched && movie && (
         <>
           <div className="poster z-10 md:order-first order-last">
             <img
