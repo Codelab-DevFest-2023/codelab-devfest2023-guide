@@ -368,22 +368,32 @@ Duration: 35:00
 
 Dans cette deuxième partie, nous allons développer une application en Server Side Rendering s'appuyant sur Next.js et Tailwind.
 
+Pour cette partie et les suivantes nous travaillerons dans le répertoire `codelab-devfest2023-next`.
+
 <aside>Pour se concentrer sur ce qui est spécifique au server side rendering, certains composants vous sont déjà fournis dans le repository : carte d'un film, méthodes de fetch, composant de layout, etc...</aside>
 
-<aside class="negative">Cet exercice utilisera le routage <strong>pages</strong> (Next.js < 13).</aside>
+<aside class="negative">Cet exercice utilisera le système de routage <strong>pages</strong> de Next.js.</aside>
+
+### Création des variables d'environnement
+
+Comme dans l'exercice précédent nous avons besoin de fournir des variables d'environnement pour fournir la clé API nécessaire à l'utilisation de l'API TMDB. Créons un fichier `.env` à la racine du projet avec le contenu suivant et remplaçons par la même clé API que celle utilisée lors de l'exercice précédent :
+
+```
+NEXT_PUBLIC_API_URL=https://api.themoviedb.org/3
+NEXT_PUBLIC_API_KEY=eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIxNTk0NTM5OGIxMzZhODZhZDU4ZjE3MmFlYTQ3ZTNjZCIsInN1YiI6IjVlNzkxY2Y0MzU3YzAwMDAxMTU0MDAwZSIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.8XGXQO22Mv8UaooWf0sDnUWRpNTdlzuO5rZClx-eEDc
+```
 
 ### Liste des films
 
-Nous allons créer un écran affichant la liste des films. Nous aurons besoin de créer la page d'affichage de la liste des films.
+Nous allons créer une page affichant la liste des films.
 
 Dans le répertoire `/src/pages/ssr` du projet, modifions le fichier `index.tsx`.
 
-Nous allons utiliser la méthode `getServerSideProps` qui permet de récupérer des données côté serveur.
-Ici, la méthode `getServerSideProps` récupère des données l'API et les transmet en tant que propriété `movies` à la page `SSRPage`. Ces données sont disponibles côté serveur lors de la demande de la page.
+Nous allons définir une méthode `getServerSideProps` qui s'exécute côté serveur lorsque la page est générée. Ici elle permet d'appeler l'API pour récupérer la liste des films et la passer en tant que props `movies` au composant `SSRPage`.
 
 ```tsx
 import { Movie } from '@/interfaces/movie.interface';
-import { getMovies } from '@/services/movie.service';
+import { fetchMovies } from '@/services/movie.service';
 import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 
 const SSRPage = ({
@@ -395,29 +405,25 @@ const SSRPage = ({
 export const getServerSideProps: GetServerSideProps<{
   movies: Movie[];
 }> = async () => {
-  const { results: movies } = await getMovies();
+  const { results: movies } = await fetchMovies();
   return { props: { movies } };
 };
 
 export default SSRPage;
 ```
 
-<aside>Vous pouvez définir <strong>getServerSideProps</strong> pour chaque page individuelle, ce qui permet d'obtenir des données spécifiques à cette page.</aside>
-
-Il ne reste plus qu'a finir de construire notre page, en affichant la liste des films :
+Il ne reste plus qu'à finir de construire notre page, en parcourant la liste de films fournie par la props `movies` :
 
 ```tsx
 import MovieCard from '@/components/movie/card/MovieCard';
 import { Movie } from '@/interfaces/movie.interface';
-import { getMovies } from '@/services/movie.service';
+import { fetchMovies } from '@/services/movie.service';
 import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 import Head from 'next/head';
 
 const SSRPage = ({
   movies,
-  total,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
-  const pathname = '/ssr';
   return (
     <>
       <Head>
@@ -427,7 +433,7 @@ const SSRPage = ({
         <ul className="movies-list grid xl:grid-cols-4 lg:grid-cols-3 sm:grid-cols-2 grid-cols-1 gap-6">
           {movies?.map((movie: Movie) => (
             <li key={movie.id}>
-              <MovieCard movie={movie} pathname={pathname} />
+              <MovieCard movie={movie} />
             </li>
           ))}
         </ul>
@@ -438,6 +444,7 @@ const SSRPage = ({
     </>
   );
 };
+
 // ...
 ```
 
@@ -445,15 +452,13 @@ Nous pouvons démarrer l'application avec la commande `npm run dev` et constater
 
 ### Optimisations des images
 
-Afin d'optimiser l'affichage des images sur l'application. Nous allons utiliser le composant Image de Next.js.
+Afin d'optimiser l'affichage des images sur l'application, nous allons utiliser le composant `Image` de Next.js.
 
-Le composant Image est conçu pour améliorer les performances et l'expérience utilisateur en matière de gestion des images, en simplifiant l'optimisation, le chargement asynchrone et l'adaptation des images aux besoins de l'utilisateur, tout en réduisant la charge de travail pour les développeurs.
+Ce composant intègre des optimisations sur la gestion des images pour améliorer l'expérience utilisateur et l'expérience développeir : chargement en mode lazy, chargement prioritaire, gestion du responsive, etc...
 
-Il offre plusieurs avantages par rapport à l'utilisation d'une balise HTML `img` standard
+Dans le répertoire `/src/components/movie/card` du projet, ouvrons le composant `MovieCard`.
 
-Dans le répertoire `/src/components/movie/card` du projet, ouvrons le fichier `MovieCard.tsx`.
-
-Remplaçons le composant `img` par un composant `Image` :
+Remplaçons le composant `img` par un composant `Image` et ajoutons la props `priority` :
 
 ```tsx
 import Image from 'next/image';
@@ -475,15 +480,11 @@ import Image from 'next/image';
 
 ### Recherche de films
 
-Nous allons créer un composant qui nous permettra de rechercher un film.
-Dans le cas d'une recherche côté serveur, la recherche de l'utilisateur sera envoyé dans l'url de la page en paramètre `http://localhost:3000/ssr?query=xxxx`.
+Nous allons créer un composant qui affiche un champ de recherche de films. Le terme recherché sera ajouté en tant que paramètre `query` dans l'url de la page : `http://localhost:3000/ssr?query=xxxx`.
 
-Dans le répertoire `/src/components/search` du projet, ouvrons le fichier `SearchBox.tsx`.
-
-<aside class="negative">Ce composant sera composé de plusieurs hooks React et devra s'exécuter côté client.Pour cela, il est impératif de spécifier <strong>'use client'</strong> dans le fichier.</aside>
+Le composant `SearchBox` est déjà fourni dans le fichier `/src/components/search/SearchBox.tsx`. Lors d'une recherche ce composant rappelle la route courante en passant le paramètre `query` dans l'url, en utilisant les hooks fournis par `next/navigation`. En tant que hooks ils s'exécutent côté client uniquement.
 
 ```tsx
-'use client'; // Composant client
 import { QUERY_PARAMS } from '@/constants';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { ChangeEvent, useState } from 'react';
@@ -525,12 +526,12 @@ const SearchBox = () => {
 export default SearchBox;
 ```
 
-Avant le rendu, la page analysera l'url afin :
+Ce paramètre `query` doit être récupéré côté serveur pour apper la bonne route d'API TMDB : 
 
-- D'appeler la route `search/movie` en cas de presence du paramètre `query`
-- D'appeler la route `movie/popular` en cas d'absence du paramètre `query`
+- La route `search/movie` en cas de présence du paramètre `query`
+- La route `movie/popular` en cas d'absence du paramètre `query`
 
-Il faut alors modifier la méthode `getServerSideProps` de la page `/src/pages/ssr/index.tsx` afin de gérer ces deux cas :
+Modifions donc la méthode `getServerSideProps` de la page `/src/pages/ssr/index.tsx` afin de récupérer le paramètre `query` et le passer à la méthode `fetchMovies` :
 
 ```tsx
 import MovieCard from '@/components/movie/card/MovieCard';
@@ -551,7 +552,7 @@ export const getServerSideProps: GetServerSideProps<{
 };
 ```
 
-Il ne reste plus qu'a ajouter le composant `Search.tsx`
+Il ne reste plus qu'a ajouter le composant `SearchBox` dans notre page `src/pages/ssr/index.tsx` :
 
 ```tsx
 import MovieCard from '@/components/movie/card/MovieCard';
@@ -572,7 +573,7 @@ import Head from 'next/head';
     <ul className="movies-list grid xl:grid-cols-4 lg:grid-cols-3 sm:grid-cols-2 grid-cols-1 gap-6">
       {movies?.map((movie: Movie) => (
         <li key={movie.id}>
-          <MovieCard movie={movie} pathname={pathname} />
+          <MovieCard movie={movie} />
         </li>
       ))}
     </ul>
@@ -586,11 +587,12 @@ import Head from 'next/head';
 
 ### Détail d'un film
 
-Ensuite, nous allons créer un écran affichant le détail de chaque film. Nous aurons besoin de créer la page d'affichage des détails d'un film.
+TODOOOOOO
+Nous allons ensuite créer une page affichant le détail de chaque film.
 
-Dans le répertoire `/src/pages/ssr` du projet, modifions le fichier `[id].tsx`.
+Dans le répertoire `/src/pages/ssr` du projet, modifions le fichier `[id].tsx`
 
-Nous allons réutiliser la méthode `getServerSideProps` pour récupérer les données concernant le film passé en paramètre.
+Modifions la méthode `getServerSideProps` pour récupérer les données concernant le film passé en paramètre.
 
 ```tsx
 import { Movie } from '@/interfaces/movie.interface';
@@ -618,7 +620,7 @@ export const getServerSideProps: GetServerSideProps<{
 export default SSRMovieDetailsPage;
 ```
 
-Il ne reste plus qu'a finir de construire notre page, En affichant :
+Il ne reste plus qu'à finir de construire notre page, en affichant :
 
 - L'affiche du film
 - Le titre du film
@@ -690,9 +692,7 @@ const SSRMovieDetailsPage = ({
 
 ### Gestion de favoris
 
-Maintenant, mettons en place une gestion des favoris en utilisant le `localstorage` du navigateur. Nous allons utiliser un nouveau composant `Like`.
-
-<aside class="negative">Ce composant aura besoin d'accèder au <strong>localstorage</strong> du navigateur. Pour cela, il doit s'exécuter côté client (<strong>'use client'</strong>).</aside>
+Pour terminer nous allons mettre en place la possibilité de gérer des films favoris à travers un composant `Like` présent dans la page de détail qui permet d'ajouter / enlever le film des favoris, stockés dans le local storage du navigateur. Le local storage n'étant disponible que côté client, il faudra s'assurer que notre code de gestion des favoris ne s'exécute que côté client.
 
 Dans le répertoire `/src/components/like` du projet, ouvrons le fichier `Like.tsx`.
 
@@ -1033,6 +1033,8 @@ Ouvrons les devtools de Chrome (ou équivalent) pour observer :
 - Les appels de service REST
 
 ## React Server Components
+
+TODO On devrait avoir des problèmes car pas de "use client"
 
 Duration: 25:00
 
