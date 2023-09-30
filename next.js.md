@@ -16,10 +16,10 @@ Prérequis :
 
 Pour ce codelab nous utiliserons deux repositories :
 
-- L'un qui servira pour l'exercice sur le client side rendering
-- L'autre servira pour les exercices suivants basés sur Next.js
+- Le premier servira pour l'exercice sur le client side rendering
+- L'autre servira pour les exercices suivants, basés sur Next.js
 
-Cloner le projet pour l'exercice sur le client side rendering, en se positionnant sur la branche `start` :
+Clonons le projet pour l'exercice sur le client side rendering, en se positionnant sur la branche `start` :
 
 ```bash
 git clone --branch start https://github.com/Codelab-DevFest-2023/codelab-devfest2023-csr.git
@@ -27,9 +27,9 @@ cd codelab-devfest2023-csr
 npm install
 ```
 
-Lancer la commande `npm run dev` et vérifier qu'on a bien une application qui s'affiche sur l'url `http://localhost:5173`.
+Lançons la commande `npm run dev` et vérifions qu'on a bien une application qui s'affiche sur l'url `http://localhost:5173`.
 
-Puis installer le projet pour les exercices avec Next.js :
+Puis installons le projet pour les exercices avec Next.js :
 
 ```bash
 git clone --branch start https://github.com/Codelab-DevFest-2023/codelab-devfest2023-next.git
@@ -37,43 +37,50 @@ cd codelab-devfest2023-next
 npm install
 ```
 
-Lancer la commande `npm run dev` et vérifier qu'on a bien une application qui s'affiche sur l'url `http://localhost:3000`.
+Lançons la commande `npm run dev` et vérifons qu'on a bien une application qui s'affiche sur l'url `http://localhost:3000`.
 
 ## Client Side Rendering
 
 Duration: 20:00
 
-Dans cette première partie, nous allons développer une application en Client Side Rendering s'appuyant sur Vite.js, React et Tailwind. Nous n'utiliserons donc pas Next.js dans cet exercice, mais il permettra de se rendre compte des différences entre le client side rendering et les autres modes de rendu que nous verrons plus tard.
+Dans cette première partie, nous allons développer une application en Client Side Rendering (CSR) s'appuyant sur Vite.js, React et Tailwind. Nous n'utiliserons donc pas Next.js dans cet exercice. Mais en créant une application en CSR, nous verrons mieux les différences avec les autres modes de rendu que nous verrons plus tard.
 
 Pour cette partie nous travaillerons dans le répertoire `codelab-devfest2023-csr`.
 
 <aside>Pour se concentrer sur ce qui est spécifique au client side rendering, certains éléments sont déjà fournis dans le repository : carte d'un film, méthodes de fetch des données, composant de layout, etc...</aside>
 
-### Création d'un fichier d'environnement
+### Création des variables d'environnement
 
-Pour pouvoir utiliser l'API TMDB nous devons fournir une clé d'API dans un fichier `.env`. Créer ce fichier `.env` à la racine du projet avec le contenu suivant :
+Pour pouvoir utiliser l'API TMDB nous devons fournir une clé d'API dans un fichier `.env`. Créons un fichier `.env` à la racine du projet avec le contenu suivant :
 
 ```
 VITE_API_URL=https://api.themoviedb.org/3
 VITE_API_KEY=eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIyZmMxMDQ0YjI0ZDdkYjcyY2RlZmJmNTBkNTkyNzhiYyIsInN1YiI6IjY0YzU2ZTgyNjNhNjk1MDEwMzk5Y2I0YiIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.Rc42SZEbnqH6PvJRj1GAVYTADLcR5vNzArE1P333_dI
 ```
 
-En utilisant une clé d'API parmi celles-ci :
-- `eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIyZmMxMDQ0YjI0ZDdkYjcyY2RlZmJmNTBkNTkyNzhiYyIsInN1YiI6IjY0YzU2ZTgyNjNhNjk1MDEwMzk5Y2I0YiIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.Rc42SZEbnqH6PvJRj1GAVYTADLcR5vNzArE1P333_dI`
-- clé 2
-- clé 3
-- clé 4
-- clé 5
+Utilisons une clé d'API parmi celles-ci :
 
-### Liste des films
+Clé 1 :
+```
+eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIyZmMxMDQ0YjI0ZDdkYjcyY2RlZmJmNTBkNTkyNzhiYyIsInN1YiI6IjY0YzU2ZTgyNjNhNjk1MDEwMzk5Y2I0YiIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.Rc42SZEbnqH6PvJRj1GAVYTADLcR5vNzArE1P333_dI
+```
 
-Pour commencer, nous allons créer un écran affichant la liste des films. Nous avons donc besoin de créer :
+Clé 2 :
+```
+eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIyZmMxMDQ0YjI0ZDdkYjcyY2RlZmJmNTBkNTkyNzhiYyIsInN1YiI6IjY0YzU2ZTgyNjNhNjk1MDEwMzk5Y2I0YiIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.Rc42SZEbnqH6PvJRj1GAVYTADLcR5vNzArE1P333_dI
+```
+
+TODO Ajouter d'autres clés
+
+### Liste des 20 films les plus populaires
+
+Pour commencer, nous allons créer une page affichant la liste des 20 films les plus populaires du moment. Nous avons donc besoin de créer :
 
 - Un hook `useMovies` qui permet de charger la liste des films
-- Une page `MoviesPage` qui affiche la liste des films
-- Une route `/movies` associée au composant `MoviesPage`
+- Un composant `MoviesListPage` qui correspond à la page affichant la liste des films
+- Une route `/movies` associée au composant `MoviesListPage`
 
-Dans le répertoire `/src/hooks` du projet, créons le fichier `movies.ts` et ajoutons y le hook `useMovies`. Ce hook s'appuie sur la librairie React Query pour gérer du cache.
+Créons le fichier `/src/hooks/movies.ts` et ajoutons y le hook `useMovies`. Ce hook s'appuie sur la librairie React Query pour charger la liste des films et gérer du cache. Elle s'appuie sur un service de fetch qui appelle l'API TMDB.
 
 ```ts
 import { useQuery } from '@tanstack/react-query';
@@ -91,8 +98,8 @@ const useMovies = () => {
 export { useMovies };
 ```
 
-Puis dans le répertoire `/src/pages` nous allons modifier le fichier `MoviesPage.tsx` :
-- Appel du hook `useMovies` pour récupérer les films (ce hook s'appuie sur la librairie React Query)
+Puis modifions le composant `MoviesListPage` dans le fichier `/src/pages/movies/MoviesListPage.tsx` :
+- Appel du hook `useMovies` pour récupérer les films
 - Affichage de `Chargement ...` pendant le chargement des données
 - Affichage d'un message d'erreur et d'un bouton `Réessayer`
 - Affichage d'une carte pour chaque film chargé
@@ -104,7 +111,7 @@ Le composant doit ressembler à ça :
 import MovieCard from '../../components/movie/card/MovieCard';
 import { useMovies } from '../../hooks/movies';
 
-const MoviesPage = () => {
+const MoviesListPage = () => {
   const { data: movies, isFetching, isError, isFetched, refetch } = useMovies();
   return (
     <div className="lg:mx-44 mx-4 space-y-4 lg:pt-6 pt-14 pb-20">
@@ -141,16 +148,16 @@ const MoviesPage = () => {
   );
 };
 
-export default MoviesPage;
+export default MoviesListPage;
 ```
 
-Enfin nous allons ajouter une route `/movies` dans le fichier `/src/App.tsx` et l'associer au composant `MoviesPage` comme ci-dessous.
+Enfin nous allons ajouter une route `/movies` dans le fichier `/src/App.tsx` et l'associer au composant `MoviesListPage` comme ci-dessous.
 
 ```ts
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import Layout from './components/layout/Layout';
-import MoviesPage from './pages/movies/MoviesPage';
 import HomePage from './pages/home/HomePage';
+import MoviesListPage from './pages/movies/MoviesListPage';
 
 const App = () => {
   return (
@@ -158,7 +165,7 @@ const App = () => {
       <Routes>
         <Route path="/" element={<Layout />}>
           <Route index element={<HomePage />} />
-          <Route path="movies" element={<MoviesPage />} />
+          <Route path="movies" element={<MoviesListPage />} />
         </Route>
       </Routes>
     </BrowserRouter>
@@ -168,17 +175,10 @@ const App = () => {
 export default App;
 ```
 
-Il ne reste plus qu'a rajouter un accès vers notre nouvelle route dans le fichier `/src/components/header/Header.tsx`
+Il ne reste plus qu'à rajouter un accès vers notre nouvelle route dans le fichier `/src/components/header/Header.tsx`
 
 ```ts
-import popcornLogo from '../../assets/popcorn.jpg';
-
-const Header = () => {
-  return (
-    <nav className="w-full bg-primary z-50 fixed top-0 left-0 right-0">
-      <div className="flex items-center bg-primary lg:mx-44 lg:justify-between lg:py-5  lg:gap-0 gap-6 mx-4 py-2">
-        <a href="/" className="flex gap-4 items-center -m-1.5 p-1.5">
-          <img src={popcornLogo} alt="Logo popcorn" width={40} height={40} />
+// ...
           <span className="hidden sm:block text-white font-semibold leading-6 xl:text-lg text-base">
             Rendu front, action !
           </span>
@@ -186,41 +186,31 @@ const Header = () => {
 
         <ul className="text-white grid lg:grid-cols-3 sm:grid-cols-2 grid-cols-1 gap-4">
           <li>
-            <a
-              href="/movies"
+            <Link
+              to="/movies"
               className="flex items-center gap-2 font-semibold leading-6 xl:text-lg text-base"
             >
               Liste des films
-            </a>
+            </Link>
           </li>
         </ul>
 
         <img
           className="lg:block hidden"
-          src={popcornLogo}
-          alt="Logo popcorn"
-          width={40}
-          height={40}
-        />
-      </div>
-    </nav>
-  );
-};
-
-export default Header;
+// ...
 ```
 
-Nous pouvons démarrer l'application avec la commande `npm run dev` et constater que la liste des films s'affiche correctement `http://localhost:5173/movies`.
+Démarrons l'application en mode développement avec la commande `npm run dev`, ouvrons `http://localhost:5173`, cliquons sur le lien "Liste des films" dans le header et vérifions que la liste des films s'affiche correctement.
 
 ### Détail d'un film
 
-Ensuite nous allons créer un écran affichant le détail de chaque film. Nous avons besoin de créer :
+Ensuite nous allons créer une page affichant le détail de chaque film. Nous avons besoin de créer :
 
 - Un hook `useMovie` qui permet de charger le détail du film
-- Un composant `MoviePage` qui définit la page de détail d'un film
-- Une route `/movies/:id` qui définit des routes pour le
+- Un composant `MovieDetailsPage` qui définit la page de détail d'un film
+- Une route `/movies/:id` qui définit la route permettant d'afficher le détail de chaque film
 
-Dans le répertoire `/src/hooks` du projet, modifions le fichier `movie.hook.ts`. avec le contenu suivant :
+Modifions le fichier `/src/hooks/movies.ts` pour ajouter un nouveau hook `useMovie` qui charge le détail d'un film (toujours en s'appuyant sur React Query) :
 
 ```ts
 import { useQuery } from '@tanstack/react-query';
@@ -240,8 +230,8 @@ const useMovie = (movieId: number) => {
 export { useMovie, useMovies };
 ```
 
-Puis dans le répertoire `/src/pages` nous allons modifier le fichier `MoviePage.tsx` :
-- Utilisation du hook `useMovie` pour récupérer le détail du film (le hook utilise React Query)
+Puis modifions le fichier `/src/pages/movies/MovieDetailsPage.tsx` :
+- Utilisation du hook `useMovie` pour récupérer le détail du film
 - Utilisation des statuts et méthodes retournés par React Query pour gérer un message de chargement et gérer les erreurs de chargement
 - Affichage des informations sur le film
 
@@ -251,7 +241,7 @@ import { useMovie } from '../../hooks/movies';
 import Like from '../../components/like/Like';
 import Note from '../../components/note/Note';
 
-const MoviePage = () => {
+const MovieDetailsPage = () => {
   const { movieId } = useParams();
   const {
     data: movie,
@@ -318,17 +308,17 @@ const MoviePage = () => {
   );
 };
 
-export default MoviePage;
+export default MovieDetailsPage;
 ```
 
-Enfin nous allons créer une route `/movies/:id` dans le fichier `/src/App.tsx`.
+Créons une nouvelle route `/movies/:id` dans le fichier `/src/App.tsx`.
 
 ```ts
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import Layout from './components/layout/Layout';
-import MoviePage from './pages/movie/MoviePage';
-import MoviesPage from './pages/movies/MoviesPage';
 import HomePage from './pages/home/HomePage';
+import MovieDetailsPage from './pages/movies/MovieDetailsPage';
+import MoviesListPage from './pages/movies/MoviesListPage';
 
 const App = () => {
   return (
@@ -336,8 +326,8 @@ const App = () => {
       <Routes>
         <Route path="/" element={<Layout />}>
           <Route index element={<HomePage />} />
-          <Route path="movies" element={<MoviesPage />} />
-          <Route path="movie/:movieId" element={<MoviePage />} />
+          <Route path="movies" element={<MoviesListPage />} />
+          <Route path="movies/:movieId" element={<MovieDetailsPage />} />
         </Route>
       </Routes>
     </BrowserRouter>
@@ -347,11 +337,25 @@ const App = () => {
 export default App;
 ```
 
-Nous pouvons démarrer l'application avec la commande `npm run dev`, cliquer sur un film afin d'accéder à la nouvelle page de détail.
+Et modifions la liste des films (`src/pages/movies/MoviesListPage.tsx`) pour ajouter un lien vers la page de détail du film sur la carte `MovieCard`, en utilisant le composant `Link` de `react-router-dom`.
+
+```ts
+{movies.map((movie) => (
+  <li key={movie.id}>
+    <Link to={`/movies/${movie.id}`}>
+      <MovieCard movie={movie} />
+    </Link>
+  </li>
+))}
+```
+
+Nous pouvons démarrer l'application avec la commande `npm run dev`, ouvrir le browser sur `http://localhost:5173`, accéder à liste des films puis cliquer sur un film afin d'accéder à la page de détail de chaque film.
 
 ### Analysons cette application
 
-Ouvrons les devtools de Chrome (ou équivalent) pour observer :
+Pour analyser le comportement d'une application client side rendering, nous allons créer une version de production de l'application avec la commande `npm run build` puis la lancer en mode preview avec la commande `npm run preview`.
+
+Ouvrons l'application sur `http://localhost:4173` puis ouvrons les devtools de Chrome (ou équivalent) pour observer :
 
 - Les chargements de fichiers Javascript
 - Les appels de service REST
@@ -756,7 +760,7 @@ const Like = ({ id }: Props) => {
 export default Like;
 ```
 
-Il ne reste plus qu'a rajouter ce nouveau composant dans la page SSR (`/src/pages/ssr/[id].tsx`) :
+Il ne reste plus qu'à rajouter ce nouveau composant dans la page SSR (`/src/pages/ssr/[id].tsx`) :
 
 ```tsx
 import Like from '@/components/like/Like';
