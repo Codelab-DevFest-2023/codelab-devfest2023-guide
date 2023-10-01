@@ -458,7 +458,7 @@ Ce composant intègre des optimisations sur la gestion des images pour améliore
 
 Dans le répertoire `/src/components/movie/card` du projet, ouvrons le composant `MovieCard`.
 
-Remplaçons le composant `img` par un composant `Image` et ajoutons la props `priority` :
+Remplaçons le composant `img` par un composant `Image` :
 
 ```tsx
 import Image from 'next/image';
@@ -472,7 +472,6 @@ import Image from 'next/image';
   height={750}
   width={500}
   sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-  priority
 />;
 
 // ...
@@ -587,7 +586,6 @@ import Head from 'next/head';
 
 ### Détail d'un film
 
-TODOOOOOO
 Nous allons ensuite créer une page affichant le détail de chaque film.
 
 Dans le répertoire `/src/pages/ssr` du projet, modifions le fichier `[id].tsx`
@@ -689,6 +687,20 @@ const SSRMovieDetailsPage = ({
 
 // ...
 ```
+
+Et enfin modifions la liste des films (`src/pages/ssr/index.tsx`) pour ajouter un lien vers la page de détail du film sur la carte `MovieCard`, en utilisant le composant `Link` de `,next/link`.
+
+```ts
+{movies?.map((movie: Movie) => (
+  <li key={movie.id}>
+    <Link href={`/ssr/${movie.id}`}>
+      <MovieCard movie={movie} />
+    </Link>
+  </li>
+))}
+```
+
+Vérifions dans l'application qu'on accède bien au détail d'un film quand on clique sur sa vignette dans la liste des films.
 
 ### Gestion de favoris
 
@@ -816,7 +828,7 @@ Dans le répertoire `/src/pages/ssg` du projet, modifions le fichier `index.tsx`
 
 Nous allons utiliser la méthode `getStaticProps` qui permet de générer des pages statiques lors de la construction de l'application, en précalculant les données à afficher sur ces pages.
 
-Ici, la méthode `getStaticProps` récupère des données l'API et les transmet en tant que propriété `movies` à la page `SSRPage`. Les données sont précalculées au moment de la construction de l'application et servies en tant que pages statiques.
+Ici, la méthode `getStaticProps` récupère des données depuis l'API et les transmet en tant que propriété `movies` à la page `SSRPage`. Les données sont précalculées au moment de la construction de l'application et servies en tant que pages statiques.
 
 ```tsx
 import { Movie } from '@/interfaces/movie.interface';

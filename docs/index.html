@@ -414,7 +414,7 @@ const SSRPage = ({
 <p>Afin d&#39;optimiser l&#39;affichage des images sur l&#39;application, nous allons utiliser le composant <code>Image</code> de Next.js.</p>
 <p>Ce composant intègre des optimisations sur la gestion des images pour améliorer l&#39;expérience utilisateur et l&#39;expérience développeir : chargement en mode lazy, chargement prioritaire, gestion du responsive, etc...</p>
 <p>Dans le répertoire <code>/src/components/movie/card</code> du projet, ouvrons le composant <code>MovieCard</code>.</p>
-<p>Remplaçons le composant <code>img</code> par un composant <code>Image</code> et ajoutons la props <code>priority</code> :</p>
+<p>Remplaçons le composant <code>img</code> par un composant <code>Image</code> :</p>
 <pre><code language="language-tsx" class="language-tsx">import Image from &#39;next/image&#39;;
 
 // ...
@@ -426,7 +426,6 @@ const SSRPage = ({
   height={750}
   width={500}
   sizes=&#34;(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw&#34;
-  priority
 /&gt;;
 
 // ...
@@ -528,7 +527,7 @@ import Head from &#39;next/head&#39;;
 // ...
 </code></pre>
 <h2 is-upgraded>Détail d&#39;un film</h2>
-<p>TODOOOOOO Nous allons ensuite créer une page affichant le détail de chaque film.</p>
+<p>Nous allons ensuite créer une page affichant le détail de chaque film.</p>
 <p>Dans le répertoire <code>/src/pages/ssr</code> du projet, modifions le fichier <code>[id].tsx</code></p>
 <p>Modifions la méthode <code>getServerSideProps</code> pour récupérer les données concernant le film passé en paramètre.</p>
 <pre><code language="language-tsx" class="language-tsx">import { Movie } from &#39;@/interfaces/movie.interface&#39;;
@@ -623,6 +622,16 @@ const SSRMovieDetailsPage = ({
 
 // ...
 </code></pre>
+<p>Et enfin modifions la liste des films (<code>src/pages/ssr/index.tsx</code>) pour ajouter un lien vers la page de détail du film sur la carte <code>MovieCard</code>, en utilisant le composant <code>Link</code> de <code>,next/link</code>.</p>
+<pre><code language="language-ts" class="language-ts">{movies?.map((movie: Movie) =&gt; (
+  &lt;li key={movie.id}&gt;
+    &lt;Link href={`/ssr/${movie.id}`}&gt;
+      &lt;MovieCard movie={movie} /&gt;
+    &lt;/Link&gt;
+  &lt;/li&gt;
+))}
+</code></pre>
+<p>Vérifions dans l&#39;application qu&#39;on accède bien au détail d&#39;un film quand on clique sur sa vignette dans la liste des films.</p>
 <h2 is-upgraded>Gestion de favoris</h2>
 <p>Pour terminer nous allons mettre en place la possibilité de gérer des films favoris à travers un composant <code>Like</code> présent dans la page de détail qui permet d&#39;ajouter / enlever le film des favoris, stockés dans le local storage du navigateur. Le local storage n&#39;étant disponible que côté client, il faudra s&#39;assurer que notre code de gestion des favoris ne s&#39;exécute que côté client.</p>
 <p>Dans le répertoire <code>/src/components/like</code> du projet, ouvrons le fichier <code>Like.tsx</code>.</p>
@@ -736,7 +745,7 @@ import Image from &#39;next/image&#39;;
 <p>Comme dans l&#39;exercice précédent, nous aurons besoin de créer la page d&#39;affichage de la liste des films.</p>
 <p>Dans le répertoire <code>/src/pages/ssg</code> du projet, modifions le fichier <code>index.tsx</code>.</p>
 <p>Nous allons utiliser la méthode <code>getStaticProps</code> qui permet de générer des pages statiques lors de la construction de l&#39;application, en précalculant les données à afficher sur ces pages.</p>
-<p>Ici, la méthode <code>getStaticProps</code> récupère des données l&#39;API et les transmet en tant que propriété <code>movies</code> à la page <code>SSRPage</code>. Les données sont précalculées au moment de la construction de l&#39;application et servies en tant que pages statiques.</p>
+<p>Ici, la méthode <code>getStaticProps</code> récupère des données depuis l&#39;API et les transmet en tant que propriété <code>movies</code> à la page <code>SSRPage</code>. Les données sont précalculées au moment de la construction de l&#39;application et servies en tant que pages statiques.</p>
 <pre><code language="language-tsx" class="language-tsx">import { Movie } from &#39;@/interfaces/movie.interface&#39;;
 import { getMovies } from &#39;@/services/movie.service&#39;;
 import { GetStaticProps, InferGetServerSidePropsType } from &#39;next&#39;;
