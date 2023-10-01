@@ -745,38 +745,29 @@ import Image from &#39;next/image&#39;;
 <h2 is-upgraded>Liste des films</h2>
 <p>Comme dans l&#39;exercice précédent, nous aurons besoin de créer la page d&#39;affichage de la liste des films.</p>
 <p>Dans le répertoire <code>/src/pages/ssg</code> du projet, modifions le fichier <code>index.tsx</code>.</p>
-<p>Nous allons utiliser la méthode <code>getStaticProps</code> qui permet de générer des pages statiques lors de la construction de l&#39;application, en précalculant les données à afficher sur ces pages.</p>
-<p>Ici, la méthode <code>getStaticProps</code> récupère des données depuis l&#39;API et les transmet en tant que propriété <code>movies</code> à la page <code>SSRPage</code>. Les données sont précalculées au moment de la construction de l&#39;application et servies en tant que pages statiques.</p>
-<pre><code language="language-tsx" class="language-tsx">import { Movie } from &#39;@/interfaces/movie.interface&#39;;
-import { getMovies } from &#39;@/services/movie.service&#39;;
-import { GetStaticProps, InferGetServerSidePropsType } from &#39;next&#39;;
-
-const SSGPage = ({
-  movies,
-}: InferGetServerSidePropsType&lt;typeof getStaticProps&gt;) =&gt; {
-  // ...
-};
-
-export const getStaticProps: GetStaticProps&lt;{
+<p>Il sera très semblable au fichier <code>/src/pages/ssr</code>. La principale différence réside dans le remplacement de méthode  <code>getServerSideProps</code> par la méthode <code>getStaticProps</code>.</p>
+<pre><code language="language-ts" class="language-ts">export const getStaticProps: GetStaticProps&lt;{
   movies: Movie[];
 }&gt; = async () =&gt; {
   const { results: movies } = await getMovies();
   return { props: { movies } };
 };
-
-export default SSGPage;
 </code></pre>
-<p>Il ne reste plus qu&#39;a finir de construire notre page, en affichant la liste des films :</p>
+<p>Le reste du fichier est très semblable à ce qui a été fait pour le server side rendering : on passe la liste des films dans la props <code>movies</code> du composant et on parcourt cette liste.</p>
 <pre><code language="language-tsx" class="language-tsx">import MovieCard from &#39;@/components/movie/card/MovieCard&#39;;
 import { Movie } from &#39;@/interfaces/movie.interface&#39;;
 import { getMovies } from &#39;@/services/movie.service&#39;;
-import { GetStaticProps, InferGetServerSidePropsType } from &#39;next&#39;;
+import {
+  GetServerSideProps,
+  GetStaticProps,
+  InferGetServerSidePropsType,
+} from &#39;next&#39;;
 import Head from &#39;next/head&#39;;
+import Link from &#39;next/link&#39;;
 
 const SSGPage = ({
   movies,
 }: InferGetServerSidePropsType&lt;typeof getStaticProps&gt;) =&gt; {
-  const pathname = &#39;/ssg&#39;;
   return (
     &lt;&gt;
       &lt;Head&gt;
@@ -786,7 +777,9 @@ const SSGPage = ({
         &lt;ul className=&#34;movies-list grid xl:grid-cols-4 lg:grid-cols-3 sm:grid-cols-2 grid-cols-1 gap-6&#34;&gt;
           {movies?.map((movie: Movie) =&gt; (
             &lt;li key={movie.id}&gt;
-              &lt;MovieCard movie={movie} pathname={pathname} /&gt;
+              &lt;Link href={`/ssg/${movie.id}`}&gt;
+                &lt;MovieCard movie={movie} /&gt;
+              &lt;/Link&gt;
             &lt;/li&gt;
           ))}
         &lt;/ul&gt;
@@ -798,85 +791,35 @@ const SSGPage = ({
   );
 };
 
-// ...
+export const getStaticProps: GetStaticProps&lt;{
+  movies: Movie[];
+}&gt; = async () =&gt; {
+  const { results: movies } = await getMovies();
+  return { props: { movies } };
+};
+
+export default SSGPage;
 </code></pre>
 <p>Nous pouvons démarrer l&#39;application avec la commande <code>npm run dev</code> et constater que la liste des films s&#39;affiche correctement à l&#39;adresse <code>http://localhost:3000/ssg</code>.</p>
 <h2 is-upgraded>Détail d&#39;un film</h2>
-<p>Ensuite, nous allons créer un écran affichant le détail de chaque film.</p>
-<p>Dans le répertoire <code>/src/pages/ssg</code> du projet, modifions le fichier <code>[id].tsx</code>.</p>
-<p>Nous allons réutiliser la méthode <code>getStaticProps</code> pour récupérer les données concernant le film passé en paramètre.</p>
-<pre><code language="language-tsx" class="language-tsx">import { Movie } from &#39;@/interfaces/movie.interface&#39;;
-import { getMovieDetails } from &#39;@/services/movie.service&#39;;
-import { GetStaticProps, InferGetServerSidePropsType } from &#39;next&#39;;
-
-const SSGMovieDetailsPage = ({
-  movie,
-}: InferGetServerSidePropsType&lt;typeof getStaticProps&gt;) =&gt; {
-  // ...
-};
-
-export const getStaticProps: GetStaticProps&lt;{
+<p>Ensuite, nous allons créer les pages affichant le détail de chaque film. Là encore le code est très proche de ce qu&#39;on a en Server Side Rendering.</p>
+<p>Modifions le fichier <code>/src/pages/ssg/[id].tsx</code> du projet et ajoutons la méthode <code>getStaticProps</code>.</p>
+<pre><code language="language-ts" class="language-ts">export const getStaticProps: GetStaticProps&lt;{
   movie: Movie;
-}&gt; = async ({ params }) =&gt; {
-  if (params?.id) {
-    const id = Number(params.id);
-    const movie = await getMovieDetails(id);
-    return { props: { movie } };
-  } else {
-    throw new Error(&#39;Missing id parameter&#39;);
-  }
+}&gt; = async ({ params = {} }) =&gt; {
+  const id = Number(params.id);
+  const movie = await getMovieDetails(id);
+  return { props: { movie } };
 };
-
-export default SSGMovieDetailsPage;
 </code></pre>
-<p>Nous devons aussi utiliser la méthode <code>getStaticPaths</code> afin de générer les chemins (URL) pour les pages dynamiques lors de la génération statique.</p>
-<aside class="special"><p><strong>getStaticPaths</strong> est souvent utilisée avec <strong>getStaticProps</strong> pour générer des pages dynamiques précalculées, où les chemins sont basés sur des données provenant d&#39;une source externe, comme une API ou une base de données.</p>
-</aside>
-<pre><code language="language-tsx" class="language-tsx">import { Movie } from &#39;@/interfaces/movie.interface&#39;;
-import { getMovieDetails, getMovies } from &#39;@/services/movie.service&#39;;
-import {
-  GetStaticPaths,
-  GetStaticProps,
-  InferGetServerSidePropsType,
-} from &#39;next&#39;;
-
-const SSGMovieDetailsPage = ({
-  movie,
-}: InferGetServerSidePropsType&lt;typeof getStaticProps&gt;) =&gt; {
-  // ...
-};
-
-export const getStaticProps: GetStaticProps&lt;{
-  movie: Movie;
-}&gt; = async ({ params }) =&gt; {
-  if (params?.id) {
-    const id = Number(params.id);
-    const movie = await getMovieDetails(id);
-    return { props: { movie } };
-  } else {
-    throw new Error(&#39;Missing id parameter&#39;);
-  }
-};
-
-export const getStaticPaths: GetStaticPaths = async () =&gt; {
-  const { results: movies } = await getMovies();
-  return {
-    paths: movies.map((movie) =&gt; `/ssg/${movie.id}`),
-    fallback: false,
-  };
-};
-
-export default SSGMovieDetailsPage;
-</code></pre>
-<p>Il ne reste plus qu&#39;a finir de construire notre page :</p>
-<pre><code language="language-tsx" class="language-tsx">import Like from &#39;@/components/like/Like&#39;;
+<p>Le reste du fichier est quasiment identique au server side rendering :</p>
+<pre><code language="language-ts" class="language-ts">import Like from &#39;@/components/like/Like&#39;;
 import Note from &#39;@/components/note/Note&#39;;
 import { Movie } from &#39;@/interfaces/movie.interface&#39;;
 import { getMovieDetails, getMovies } from &#39;@/services/movie.service&#39;;
 import {
-  GetStaticPaths,
   GetStaticProps,
-  InferGetServerSidePropsType,
+  InferGetServerSidePropsType
 } from &#39;next&#39;;
 import Head from &#39;next/head&#39;;
 import Image from &#39;next/image&#39;;
@@ -934,14 +877,38 @@ const SSGMovieDetailsPage = ({
   );
 };
 
-// ...
+export const getStaticProps: GetStaticProps&lt;{
+  movie: Movie;
+}&gt; = async ({ params = {} }) =&gt; {
+  const id = Number(params.id);
+  const movie = await getMovieDetails(id);
+  return { props: { movie } };
+};
+
+export default SSGMovieDetailsPage;
 </code></pre>
-<h2 is-upgraded>Observons ce qui se passe</h2>
-<p>Ouvrons les devtools de Chrome (ou équivalent) pour observer :</p>
-<ul>
-<li>Les chargements de fichiers Javascript</li>
-<li>Les appels de service REST</li>
-</ul>
+<p>Nous avons cependant besoin d&#39;ajouter une méthode supplémentaire dans ce fichier : la méthode <code>getStaticPaths</code> retourne la liste des URLs des pages de détail à créer en s&#39;appuyant sur la liste des films.</p>
+<pre><code language="language-ts" class="language-ts">import {
+  GetStaticPaths,
+  GetStaticProps,
+  InferGetServerSidePropsType
+} from &#39;next&#39;;
+
+// ...
+
+export const getStaticPaths: GetStaticPaths = async () =&gt; {
+  const { results: movies } = await getMovies();
+  return {
+    paths: movies.map((movie) =&gt; `/ssg/${movie.id}`),
+    fallback: false,
+  };
+};
+</code></pre>
+<aside class="special"><p>On voit ici que vu qu&#39;on génère une page pour chaque film, le build de l&#39;application en mode Static Site Generation peut être long si on s&#39;intéresse à l&#39;ensemble des films de la base TMDB ! C&#39;est pour cette raison que dans cet exercice on s&#39;est intéressés uniquement aux films populaires du moment.</p>
+</aside>
+<h2 is-upgraded>Observons ce qui se passe ...</h2>
+<p>Pour réellement comprendre le fonctionnement du Static Site Generation, il faut lancer le build du site avec la commande <code>npm run build</code>. Observons alors que des requêtes sont envoyées à l&#39;API TMDB pour construire des pages statiques.</p>
+<p>Exécutons ensuite la commande <code>npm run start</code> pour lancer l&#39;application. Le résultat pour l&#39;utilisateur est rigoureusement identique.</p>
 
 
       </google-codelab-step>

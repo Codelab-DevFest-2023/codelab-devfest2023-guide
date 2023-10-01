@@ -828,19 +828,55 @@ Comme dans l'exercice précédent, nous aurons besoin de créer la page d'affich
 
 Dans le répertoire `/src/pages/ssg` du projet, modifions le fichier `index.tsx`.
 
-Nous allons utiliser la méthode `getStaticProps` qui permet de générer des pages statiques lors de la construction de l'application, en précalculant les données à afficher sur ces pages.
+Il sera très semblable au fichier `/src/pages/ssr`. La principale différence réside dans le remplacement de méthode  `getServerSideProps` par la méthode `getStaticProps`.
 
-Ici, la méthode `getStaticProps` récupère des données depuis l'API et les transmet en tant que propriété `movies` à la page `SSRPage`. Les données sont précalculées au moment de la construction de l'application et servies en tant que pages statiques.
+```ts
+export const getStaticProps: GetStaticProps<{
+  movies: Movie[];
+}> = async () => {
+  const { results: movies } = await getMovies();
+  return { props: { movies } };
+};
+```
+
+Le reste du fichier est très semblable à ce qui a été fait pour le server side rendering : on passe la liste des films dans la props `movies` du composant et on parcourt cette liste.
 
 ```tsx
+import MovieCard from '@/components/movie/card/MovieCard';
 import { Movie } from '@/interfaces/movie.interface';
 import { getMovies } from '@/services/movie.service';
-import { GetStaticProps, InferGetServerSidePropsType } from 'next';
+import {
+  GetServerSideProps,
+  GetStaticProps,
+  InferGetServerSidePropsType,
+} from 'next';
+import Head from 'next/head';
+import Link from 'next/link';
 
 const SSGPage = ({
   movies,
 }: InferGetServerSidePropsType<typeof getStaticProps>) => {
-  // ...
+  return (
+    <>
+      <Head>
+        <title>Static Site Generation</title>
+      </Head>
+      <main className="lg:mx-44 mx-4 space-y-4 lg:pt-6 pt-14 pb-20">
+        <ul className="movies-list grid xl:grid-cols-4 lg:grid-cols-3 sm:grid-cols-2 grid-cols-1 gap-6">
+          {movies?.map((movie: Movie) => (
+            <li key={movie.id}>
+              <Link href={`/ssg/${movie.id}`}>
+                <MovieCard movie={movie} />
+              </Link>
+            </li>
+          ))}
+        </ul>
+        {movies.length < 1 && (
+          <p className="font-medium text-3xl">Aucun résultat</p>
+        )}
+      </main>
+    </>
+  );
 };
 
 export const getStaticProps: GetStaticProps<{
@@ -853,132 +889,34 @@ export const getStaticProps: GetStaticProps<{
 export default SSGPage;
 ```
 
-Il ne reste plus qu'a finir de construire notre page, en affichant la liste des films :
-
-```tsx
-import MovieCard from '@/components/movie/card/MovieCard';
-import { Movie } from '@/interfaces/movie.interface';
-import { getMovies } from '@/services/movie.service';
-import { GetStaticProps, InferGetServerSidePropsType } from 'next';
-import Head from 'next/head';
-
-const SSGPage = ({
-  movies,
-}: InferGetServerSidePropsType<typeof getStaticProps>) => {
-  const pathname = '/ssg';
-  return (
-    <>
-      <Head>
-        <title>Static Site Generation</title>
-      </Head>
-      <main className="lg:mx-44 mx-4 space-y-4 lg:pt-6 pt-14 pb-20">
-        <ul className="movies-list grid xl:grid-cols-4 lg:grid-cols-3 sm:grid-cols-2 grid-cols-1 gap-6">
-          {movies?.map((movie: Movie) => (
-            <li key={movie.id}>
-              <MovieCard movie={movie} pathname={pathname} />
-            </li>
-          ))}
-        </ul>
-        {movies.length < 1 && (
-          <p className="font-medium text-3xl">Aucun résultat</p>
-        )}
-      </main>
-    </>
-  );
-};
-
-// ...
-```
-
 Nous pouvons démarrer l'application avec la commande `npm run dev` et constater que la liste des films s'affiche correctement à l'adresse `http://localhost:3000/ssg`.
 
 ### Détail d'un film
 
-Ensuite, nous allons créer un écran affichant le détail de chaque film.
+Ensuite, nous allons créer les pages affichant le détail de chaque film. Là encore le code est très proche de ce qu'on a en Server Side Rendering.
 
-Dans le répertoire `/src/pages/ssg` du projet, modifions le fichier `[id].tsx`.
+Modifions le fichier `/src/pages/ssg/[id].tsx` du projet et ajoutons la méthode `getStaticProps`.
 
-Nous allons réutiliser la méthode `getStaticProps` pour récupérer les données concernant le film passé en paramètre.
-
-```tsx
-import { Movie } from '@/interfaces/movie.interface';
-import { getMovieDetails } from '@/services/movie.service';
-import { GetStaticProps, InferGetServerSidePropsType } from 'next';
-
-const SSGMovieDetailsPage = ({
-  movie,
-}: InferGetServerSidePropsType<typeof getStaticProps>) => {
-  // ...
-};
-
+```ts
 export const getStaticProps: GetStaticProps<{
   movie: Movie;
-}> = async ({ params }) => {
-  if (params?.id) {
-    const id = Number(params.id);
-    const movie = await getMovieDetails(id);
-    return { props: { movie } };
-  } else {
-    throw new Error('Missing id parameter');
-  }
+}> = async ({ params = {} }) => {
+  const id = Number(params.id);
+  const movie = await getMovieDetails(id);
+  return { props: { movie } };
 };
-
-export default SSGMovieDetailsPage;
 ```
 
-Nous devons aussi utiliser la méthode `getStaticPaths` afin de générer les chemins (URL) pour les pages dynamiques lors de la génération statique.
+Le reste du fichier est quasiment identique au server side rendering :
 
-<aside><strong>getStaticPaths</strong> est souvent utilisée avec <strong>getStaticProps</strong> pour générer des pages dynamiques précalculées, où les chemins sont basés sur des données provenant d'une source externe, comme une API ou une base de données.</aside>
-
-```tsx
-import { Movie } from '@/interfaces/movie.interface';
-import { getMovieDetails, getMovies } from '@/services/movie.service';
-import {
-  GetStaticPaths,
-  GetStaticProps,
-  InferGetServerSidePropsType,
-} from 'next';
-
-const SSGMovieDetailsPage = ({
-  movie,
-}: InferGetServerSidePropsType<typeof getStaticProps>) => {
-  // ...
-};
-
-export const getStaticProps: GetStaticProps<{
-  movie: Movie;
-}> = async ({ params }) => {
-  if (params?.id) {
-    const id = Number(params.id);
-    const movie = await getMovieDetails(id);
-    return { props: { movie } };
-  } else {
-    throw new Error('Missing id parameter');
-  }
-};
-
-export const getStaticPaths: GetStaticPaths = async () => {
-  const { results: movies } = await getMovies();
-  return {
-    paths: movies.map((movie) => `/ssg/${movie.id}`),
-    fallback: false,
-  };
-};
-
-export default SSGMovieDetailsPage;
-```
-
-Il ne reste plus qu'a finir de construire notre page :
-
-```tsx
+```ts
 import Like from '@/components/like/Like';
 import Note from '@/components/note/Note';
 import { Movie } from '@/interfaces/movie.interface';
 import { getMovieDetails, getMovies } from '@/services/movie.service';
 import {
-  GetStaticPaths,
   GetStaticProps,
-  InferGetServerSidePropsType,
+  InferGetServerSidePropsType
 } from 'next';
 import Head from 'next/head';
 import Image from 'next/image';
@@ -1036,15 +974,45 @@ const SSGMovieDetailsPage = ({
   );
 };
 
-// ...
+export const getStaticProps: GetStaticProps<{
+  movie: Movie;
+}> = async ({ params = {} }) => {
+  const id = Number(params.id);
+  const movie = await getMovieDetails(id);
+  return { props: { movie } };
+};
+
+export default SSGMovieDetailsPage;
 ```
 
-### Observons ce qui se passe
+Nous avons cependant besoin d'ajouter une méthode supplémentaire dans ce fichier : la méthode `getStaticPaths` retourne la liste des URLs des pages de détail à créer en s'appuyant sur la liste des films.
 
-Ouvrons les devtools de Chrome (ou équivalent) pour observer :
+```ts
+import {
+  GetStaticPaths,
+  GetStaticProps,
+  InferGetServerSidePropsType
+} from 'next';
 
-- Les chargements de fichiers Javascript
-- Les appels de service REST
+// ...
+
+export const getStaticPaths: GetStaticPaths = async () => {
+  const { results: movies } = await getMovies();
+  return {
+    paths: movies.map((movie) => `/ssg/${movie.id}`),
+    fallback: false,
+  };
+};
+```
+
+<aside>On voit ici que vu qu'on génère une page pour chaque film, le build de l'application en mode Static Site Generation peut être long si on s'intéresse à l'ensemble des films de la base TMDB ! C'est pour cette raison que dans cet exercice on s'est intéressés uniquement aux films populaires du moment.</aside>
+
+### Observons ce qui se passe ...
+
+Pour réellement comprendre le fonctionnement du Static Site Generation, il faut lancer le build du site avec la commande `npm run build`.
+Observons alors que des requêtes sont envoyées à l'API TMDB pour construire des pages statiques.
+
+Exécutons ensuite la commande `npm run start` pour lancer l'application. Le résultat pour l'utilisateur est rigoureusement identique.
 
 ## React Server Components
 
