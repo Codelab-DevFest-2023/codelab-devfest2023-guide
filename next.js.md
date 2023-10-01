@@ -805,7 +805,9 @@ import Image from 'next/image';
 
 ### Observons ce qui se passe
 
-Ouvrons les devtools de Chrome (ou équivalent) pour observer :
+Construisons une version de production de l'application avec la commande `npm run build` puis démarrons l'application avec la commande `npm run start`.
+
+Ouvrons l'application sur `http://localhost:3000` puis accédons à la rubrique "Server Side Rendering" et observons ce qui se passe dans les devtools de Chrome (ou équivalent) :
 
 - Les chargements de fichiers Javascript
 - Les appels de service REST
