@@ -535,7 +535,7 @@ Ce paramètre `query` doit être récupéré côté serveur pour apper la bonne 
 - La route `search/movie` en cas de présence du paramètre `query`
 - La route `movie/popular` en cas d'absence du paramètre `query`
 
-Modifions donc la méthode `getServerSideProps` de la page `/src/pages/ssr/index.tsx` afin de récupérer le paramètre `query` et le passer à la méthode `fetchMovies` :
+Modifions donc la méthode `getServerSideProps` de la page `/src/pages/ssr/index.tsx` afin de récupérer le paramètre `query` et le passer à la méthode `fetchPopularMovies` :
 
 ```tsx
 import MovieCard from '@/components/movie/card/MovieCard';
