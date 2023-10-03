@@ -88,12 +88,12 @@ Créons le fichier `/src/hooks/movies.ts` et ajoutons y le hook `useMovies`. Ce 
 import { useQuery } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
 import { Movie } from '../interfaces/movie.interface';
-import { getMovies } from '../services/movie.service';
+import { fetchPopularMovies } from '../services/movie.service';
 
 const useMovies = () => {
   return useQuery<Movie[], AxiosError>({
     queryKey: ['movies'],
-    queryFn: () => getMovies(),
+    queryFn: () => fetchPopularMovies(),
   });
 };
 
@@ -117,7 +117,7 @@ import { useMovies } from '../../hooks/movies';
 const MoviesListPage = () => {
   const { data: movies, isFetching, isError, isFetched, refetch } = useMovies();
   return (
-    <div className="lg:mx-44 mx-4 space-y-4 lg:pt-6 pt-14 pb-20">
+    <div className="main-container">
       {isError && (
         <div>
           <p className="text-red mb-4">
@@ -135,7 +135,7 @@ const MoviesListPage = () => {
       )}
       {isFetching && <p>Chargement...</p>}
       {isFetched && movies && movies?.length > 0 && (
-        <ul className="movies-list grid xl:grid-cols-4 lg:grid-cols-3 sm:grid-cols-2 grid-cols-1 gap-6">
+        <ul className="movies-list">
           {movies.map((movie) => (
             <li key={movie.id}>
               <MovieCard movie={movie} />
@@ -218,14 +218,17 @@ Modifions le fichier `/src/hooks/movies.ts` pour ajouter un nouveau hook `useMov
 import { useQuery } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
 import { Movie } from '../interfaces/movie.interface';
-import { getMovieDetails, getMovies } from '../services/movie.service';
+import {
+  fetchMovieDetails,
+  fetchPopularMovies,
+} from '../services/movie.service';
 
 // ...
 
 const useMovie = (movieId: number) => {
   return useQuery<Movie, AxiosError>({
     queryKey: ['movies', movieId],
-    queryFn: () => getMovieDetails(movieId),
+    queryFn: () => fetchMovieDetails(movieId),
   });
 };
 
@@ -434,8 +437,8 @@ const SSRPage = ({
       <Head>
         <title>Server Side Rendering</title>
       </Head>
-      <main className="lg:mx-44 mx-4 space-y-4 lg:pt-6 pt-14 pb-20">
-        <ul className="movies-list grid xl:grid-cols-4 lg:grid-cols-3 sm:grid-cols-2 grid-cols-1 gap-6">
+      <main className="main-container">
+        <ul className="movies-list">
           {movies?.map((movie: Movie) => (
             <li key={movie.id}>
               <MovieCard movie={movie} />
@@ -489,7 +492,6 @@ Nous allons créer un composant qui affiche un champ de recherche de films. Le t
 Le composant `SearchBox` est déjà fourni dans le fichier `/src/components/search/SearchBox.tsx`. Lors d'une recherche ce composant rappelle la route courante en passant le paramètre `query` dans l'url, en utilisant les hooks fournis par `next/navigation`. En tant que hooks ils s'exécutent côté client uniquement.
 
 ```tsx
-import { QUERY_PARAMS } from '@/constants';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { ChangeEvent, useState } from 'react';
 
@@ -505,13 +507,13 @@ const SearchBox = () => {
     setSearchValue(value);
 
     const queryParams = new URLSearchParams();
-    queryParams.append(QUERY_PARAMS.QUERY, encodeURI(value));
+    queryParams.append('query', encodeURI(value));
 
     if (value.length > 3) {
       router.push(`${currentPathname}?${queryParams.toString()}`);
     }
 
-    if (value.length <= 2 && searchParams?.get(QUERY_PARAMS.QUERY)) {
+    if (value.length <= 2 && searchParams?.get('query')) {
       router.push(currentPathname);
     }
   };
@@ -519,7 +521,7 @@ const SearchBox = () => {
   return (
     <input
       type="text"
-      className="text-xl py-3 px-6 bg-white rounded-full w-fit focus-visible:ring-primary focus-visible:ring-offset-primary"
+      className="search-input"
       placeholder="Recherche ..."
       value={searchValue}
       onChange={handleSearchChange}
@@ -581,9 +583,9 @@ import Link from 'next/link';
   <Head>
     <title>Server Side Rendering</title>
   </Head>
-  <main className="lg:mx-44 mx-4 space-y-4 lg:pt-6 pt-14 pb-20">
+  <main className="main-container">
     <SearchBox />
-    <ul className="movies-list grid xl:grid-cols-4 lg:grid-cols-3 sm:grid-cols-2 grid-cols-1 gap-6">
+    <ul className="movies-list">
       {movies?.map((movie: Movie) => (
         <li key={movie.id}>
           <MovieCard movie={movie} />
@@ -877,8 +879,8 @@ const SSGPage = ({
       <Head>
         <title>Static Site Generation</title>
       </Head>
-      <main className="lg:mx-44 mx-4 space-y-4 lg:pt-6 pt-14 pb-20">
-        <ul className="movies-list grid xl:grid-cols-4 lg:grid-cols-3 sm:grid-cols-2 grid-cols-1 gap-6">
+      <main className="main-container">
+        <ul className="movies-list">
           {movies?.map((movie: Movie) => (
             <li key={movie.id}>
               <Link href={`/ssg/${movie.id}`}>
@@ -1074,9 +1076,9 @@ const RSCPage = async ({ searchParams }: Props) => {
   }
 
   return (
-    <main className="lg:mx-44 mx-4 space-y-4 lg:pt-6 pt-14 pb-20">
+    <main className="main-container">
       <SearchBox />
-      <ul className="movies-list grid xl:grid-cols-4 lg:grid-cols-3 sm:grid-cols-2 grid-cols-1 gap-6">
+      <ul className="movies-list">
         {movies?.map((movie: Movie) => (
           <li key={movie.id}>
             <Link href={`/rsc/${movie.id}`}>
@@ -1182,7 +1184,7 @@ Commençons par la méthode `fetchMovieDetails` en ajoutant `next: { revalidate:
 ```tsx
 const fetchMovieDetails = async (movieId: number): Promise<Movie> => {
   const queryParams = new URLSearchParams();
-  queryParams.append(QUERY_PARAMS.LANGUAGE, DEFAULT_PARAMS.LANGUAGE);
+  queryParams.append('language', 'fr-FR');
 
   const URL = `${
     process.env.NEXT_PUBLIC_API_URL
@@ -1247,7 +1249,7 @@ const RSCMovieDetailsPage = async ({ params }: { params: { id: number } }) => {
       <div className="flex flex-col gap-3 ml-4 text-white mt-3">
         {/*  ...  */}
       </div>
-      <div className="grid lg:grid-cols-3 sm:grid-cols-2 grid-cols-1 gap-6 p-4">
+      <div className="reviews-list">
         {reviews.map((review: Review) => (
           <MovieReview key={review.id} review={review} />
         ))}

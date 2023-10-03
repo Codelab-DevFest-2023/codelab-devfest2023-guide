@@ -87,12 +87,12 @@ VITE_API_KEY=eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIyZmMxMDQ0YjI0ZDdkYjcyY2RlZmJmNTBkNT
 <pre><code language="language-ts" class="language-ts">import { useQuery } from &#39;@tanstack/react-query&#39;;
 import { AxiosError } from &#39;axios&#39;;
 import { Movie } from &#39;../interfaces/movie.interface&#39;;
-import { getMovies } from &#39;../services/movie.service&#39;;
+import { fetchPopularMovies } from &#39;../services/movie.service&#39;;
 
 const useMovies = () =&gt; {
   return useQuery&lt;Movie[], AxiosError&gt;({
     queryKey: [&#39;movies&#39;],
-    queryFn: () =&gt; getMovies(),
+    queryFn: () =&gt; fetchPopularMovies(),
   });
 };
 
@@ -113,7 +113,7 @@ import { useMovies } from &#39;../../hooks/movies&#39;;
 const MoviesListPage = () =&gt; {
   const { data: movies, isFetching, isError, isFetched, refetch } = useMovies();
   return (
-    &lt;div className=&#34;lg:mx-44 mx-4 space-y-4 lg:pt-6 pt-14 pb-20&#34;&gt;
+    &lt;div className=&#34;main-container&#34;&gt;
       {isError &amp;&amp; (
         &lt;div&gt;
           &lt;p className=&#34;text-red mb-4&#34;&gt;
@@ -130,9 +130,8 @@ const MoviesListPage = () =&gt; {
         &lt;/div&gt;
       )}
       {isFetching &amp;&amp; &lt;p&gt;Chargement...&lt;/p&gt;}
-      {
-        isFetched &amp;&amp; movies &amp;&amp; movies?.length &gt; 0 &amp;&amp; (
-        &lt;ul className=&#34;movies-list grid xl:grid-cols-4 lg:grid-cols-3 sm:grid-cols-2 grid-cols-1 gap-6&#34;&gt;
+      {isFetched &amp;&amp; movies &amp;&amp; movies?.length &gt; 0 &amp;&amp; (
+        &lt;ul className=&#34;movies-list&#34;&gt;
           {movies.map((movie) =&gt; (
             &lt;li key={movie.id}&gt;
               &lt;MovieCard movie={movie} /&gt;
@@ -204,14 +203,17 @@ export default App;
 <pre><code language="language-ts" class="language-ts">import { useQuery } from &#39;@tanstack/react-query&#39;;
 import { AxiosError } from &#39;axios&#39;;
 import { Movie } from &#39;../interfaces/movie.interface&#39;;
-import { getMovieDetails, getMovies } from &#39;../services/movie.service&#39;;
+import {
+  fetchMovieDetails,
+  fetchPopularMovies,
+} from &#39;../services/movie.service&#39;;
 
 // ...
 
 const useMovie = (movieId: number) =&gt; {
   return useQuery&lt;Movie, AxiosError&gt;({
     queryKey: [&#39;movies&#39;, movieId],
-    queryFn: () =&gt; getMovieDetails(movieId),
+    queryFn: () =&gt; fetchMovieDetails(movieId),
   });
 };
 
@@ -321,13 +323,15 @@ const App = () =&gt; {
 export default App;
 </code></pre>
 <p>Et modifions la liste des films (<code>src/pages/movies/MoviesListPage.tsx</code>) pour ajouter un lien vers la page de détail du film sur la carte <code>MovieCard</code>, en utilisant le composant <code>Link</code> de <code>react-router-dom</code>.</p>
-<pre><code language="language-ts" class="language-ts">{movies.map((movie) =&gt; (
-  &lt;li key={movie.id}&gt;
-    &lt;Link to={`/movies/${movie.id}`}&gt;
-      &lt;MovieCard movie={movie} /&gt;
-    &lt;/Link&gt;
-  &lt;/li&gt;
-))}
+<pre><code language="language-ts" class="language-ts">{
+  movies.map((movie) =&gt; (
+    &lt;li key={movie.id}&gt;
+      &lt;Link to={`/movies/${movie.id}`}&gt;
+        &lt;MovieCard movie={movie} /&gt;
+      &lt;/Link&gt;
+    &lt;/li&gt;
+  ));
+}
 </code></pre>
 <p>Nous pouvons démarrer l&#39;application avec la commande <code>npm run dev</code>, ouvrir le browser sur <code>http://localhost:5173</code>, accéder à liste des films puis cliquer sur un film afin d&#39;accéder à la page de détail de chaque film.</p>
 <h2 is-upgraded>Analysons cette application</h2>
@@ -359,7 +363,7 @@ NEXT_PUBLIC_API_KEY=eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIxNTk0NTM5OGIxMzZhODZhZDU4ZjE
 <p>Dans le répertoire <code>/src/pages/ssr</code> du projet, modifions le fichier <code>index.tsx</code>.</p>
 <p>Nous allons définir une méthode <code>getServerSideProps</code> qui s&#39;exécute côté serveur lorsque la page est générée. Ici elle permet d&#39;appeler l&#39;API pour récupérer la liste des films et la passer en tant que props <code>movies</code> au composant <code>SSRPage</code>.</p>
 <pre><code language="language-tsx" class="language-tsx">import { Movie } from &#39;@/interfaces/movie.interface&#39;;
-import { fetchMovies } from &#39;@/services/movie.service&#39;;
+import { fetchPopularMovies } from &#39;@/services/movie.service&#39;;
 import { GetServerSideProps, InferGetServerSidePropsType } from &#39;next&#39;;
 
 const SSRPage = ({
@@ -371,7 +375,7 @@ const SSRPage = ({
 export const getServerSideProps: GetServerSideProps&lt;{
   movies: Movie[];
 }&gt; = async () =&gt; {
-  const { results: movies } = await fetchMovies();
+  const { results: movies } = await fetchPopularMovies();
   return { props: { movies } };
 };
 
@@ -380,7 +384,7 @@ export default SSRPage;
 <p>Il ne reste plus qu&#39;à finir de construire notre page, en parcourant la liste de films fournie par la props <code>movies</code> :</p>
 <pre><code language="language-tsx" class="language-tsx">import MovieCard from &#39;@/components/movie/card/MovieCard&#39;;
 import { Movie } from &#39;@/interfaces/movie.interface&#39;;
-import { fetchMovies } from &#39;@/services/movie.service&#39;;
+import { fetchPopularMovies } from &#39;@/services/movie.service&#39;;
 import { GetServerSideProps, InferGetServerSidePropsType } from &#39;next&#39;;
 import Head from &#39;next/head&#39;;
 
@@ -392,8 +396,8 @@ const SSRPage = ({
       &lt;Head&gt;
         &lt;title&gt;Server Side Rendering&lt;/title&gt;
       &lt;/Head&gt;
-      &lt;main className=&#34;lg:mx-44 mx-4 space-y-4 lg:pt-6 pt-14 pb-20&#34;&gt;
-        &lt;ul className=&#34;movies-list grid xl:grid-cols-4 lg:grid-cols-3 sm:grid-cols-2 grid-cols-1 gap-6&#34;&gt;
+      &lt;main className=&#34;main-container&#34;&gt;
+        &lt;ul className=&#34;movies-list&#34;&gt;
           {movies?.map((movie: Movie) =&gt; (
             &lt;li key={movie.id}&gt;
               &lt;MovieCard movie={movie} /&gt;
@@ -434,8 +438,7 @@ const SSRPage = ({
 <h2 is-upgraded>Recherche de films</h2>
 <p>Nous allons créer un composant qui affiche un champ de recherche de films. Le terme recherché sera ajouté en tant que paramètre <code>query</code> dans l&#39;url de la page : <code>http://localhost:3000/ssr?query=xxxx</code>.</p>
 <p>Le composant <code>SearchBox</code> est déjà fourni dans le fichier <code>/src/components/search/SearchBox.tsx</code>. Lors d&#39;une recherche ce composant rappelle la route courante en passant le paramètre <code>query</code> dans l&#39;url, en utilisant les hooks fournis par <code>next/navigation</code>. En tant que hooks ils s&#39;exécutent côté client uniquement.</p>
-<pre><code language="language-tsx" class="language-tsx">import { QUERY_PARAMS } from &#39;@/constants&#39;;
-import { usePathname, useRouter, useSearchParams } from &#39;next/navigation&#39;;
+<pre><code language="language-tsx" class="language-tsx">import { usePathname, useRouter, useSearchParams } from &#39;next/navigation&#39;;
 import { ChangeEvent, useState } from &#39;react&#39;;
 
 const SearchBox = () =&gt; {
@@ -450,13 +453,13 @@ const SearchBox = () =&gt; {
     setSearchValue(value);
 
     const queryParams = new URLSearchParams();
-    queryParams.append(QUERY_PARAMS.QUERY, encodeURI(value));
+    queryParams.append(&#39;query&#39;, encodeURI(value));
 
     if (value.length &gt; 3) {
       router.push(`${currentPathname}?${queryParams.toString()}`);
     }
 
-    if (value.length &lt;= 2 &amp;&amp; searchParams?.get(QUERY_PARAMS.QUERY)) {
+    if (value.length &lt;= 2 &amp;&amp; searchParams?.get(&#39;query&#39;)) {
       router.push(currentPathname);
     }
   };
@@ -464,7 +467,7 @@ const SearchBox = () =&gt; {
   return (
     &lt;input
       type=&#34;text&#34;
-      className=&#34;text-xl py-3 px-6 bg-white rounded-full w-fit focus-visible:ring-primary focus-visible:ring-offset-primary&#34;
+      className=&#34;search-input&#34;
       placeholder=&#34;Recherche ...&#34;
       value={searchValue}
       onChange={handleSearchChange}
@@ -479,41 +482,50 @@ export default SearchBox;
 <li>La route <code>search/movie</code> en cas de présence du paramètre <code>query</code></li>
 <li>La route <code>movie/popular</code> en cas d&#39;absence du paramètre <code>query</code></li>
 </ul>
-<p>Modifions donc la méthode <code>getServerSideProps</code> de la page <code>/src/pages/ssr/index.tsx</code> afin de récupérer le paramètre <code>query</code> et le passer à la méthode <code>fetchMovies</code> :</p>
+<p>Modifions donc la méthode <code>getServerSideProps</code> de la page <code>/src/pages/ssr/index.tsx</code> afin de récupérer le paramètre <code>query</code> et le passer à la méthode <code>fetchPopularMovies</code> :</p>
 <pre><code language="language-tsx" class="language-tsx">import MovieCard from &#39;@/components/movie/card/MovieCard&#39;;
-import { transformParsedUrlQuery } from &#39;@/helpers&#39;;
+import SearchBox from &#39;@/components/search/SearchBox&#39;;
 import { Movie } from &#39;@/interfaces/movie.interface&#39;;
-import { fetchMovies } from &#39;@/services/movie.service&#39;;
+import { fetchPopularMovies, searchMovies } from &#39;@/services/movie.service&#39;;
 import { GetServerSideProps, InferGetServerSidePropsType } from &#39;next&#39;;
 import Head from &#39;next/head&#39;;
+import Link from &#39;next/link&#39;;
 
 // ...
 
 export const getServerSideProps: GetServerSideProps&lt;{
   movies: Movie[];
-}&gt; = async ({ query: params }) =&gt; {
-  const searchParams = transformParsedUrlQuery(params);
-  const { results: movies } = await fetchMovies(searchParams);
+}&gt; = async ({ query: searchParams }) =&gt; {
+  let movies: Movie[];
+
+  if (searchParams.query) {
+    const { results } = await searchMovies(searchParams.query as string);
+    movies = results;
+  } else {
+    const { results } = await fetchPopularMovies();
+    movies = results;
+  }
+
   return { props: { movies } };
 };
 </code></pre>
 <p>Il ne reste plus qu&#39;a ajouter le composant <code>SearchBox</code> dans notre page <code>src/pages/ssr/index.tsx</code> :</p>
 <pre><code language="language-tsx" class="language-tsx">import MovieCard from &#39;@/components/movie/card/MovieCard&#39;;
 import SearchBox from &#39;@/components/search/SearchBox&#39;;
-import { transformParsedUrlQuery } from &#39;@/helpers&#39;;
 import { Movie } from &#39;@/interfaces/movie.interface&#39;;
-import { fetchMovies } from &#39;@/services/movie.service&#39;;
+import { fetchPopularMovies, searchMovies } from &#39;@/services/movie.service&#39;;
 import { GetServerSideProps, InferGetServerSidePropsType } from &#39;next&#39;;
 import Head from &#39;next/head&#39;;
+import Link from &#39;next/link&#39;;
 
 // ...
 &lt;&gt;
   &lt;Head&gt;
     &lt;title&gt;Server Side Rendering&lt;/title&gt;
   &lt;/Head&gt;
-  &lt;main className=&#34;lg:mx-44 mx-4 space-y-4 lg:pt-6 pt-14 pb-20&#34;&gt;
+  &lt;main className=&#34;main-container&#34;&gt;
     &lt;SearchBox /&gt;
-    &lt;ul className=&#34;movies-list grid xl:grid-cols-4 lg:grid-cols-3 sm:grid-cols-2 grid-cols-1 gap-6&#34;&gt;
+    &lt;ul className=&#34;movies-list&#34;&gt;
       {movies?.map((movie: Movie) =&gt; (
         &lt;li key={movie.id}&gt;
           &lt;MovieCard movie={movie} /&gt;
@@ -532,7 +544,7 @@ import Head from &#39;next/head&#39;;
 <p>Dans le répertoire <code>/src/pages/ssr</code> du projet, modifions le fichier <code>[id].tsx</code></p>
 <p>Modifions la méthode <code>getServerSideProps</code> pour récupérer les données concernant le film passé en paramètre.</p>
 <pre><code language="language-tsx" class="language-tsx">import { Movie } from &#39;@/interfaces/movie.interface&#39;;
-import { getMovieDetails } from &#39;@/services/movie.service&#39;;
+import { fetchMovieDetails } from &#39;@/services/movie.service&#39;;
 import { GetServerSideProps, InferGetServerSidePropsType } from &#39;next&#39;;
 
 const SSRMovieDetailsPage = ({
@@ -546,7 +558,7 @@ export const getServerSideProps: GetServerSideProps&lt;{
 }&gt; = async ({ params }) =&gt; {
   if (params?.id) {
     const id = Number(params.id);
-    const movie = await getMovieDetails(id);
+    const movie = await fetchMovieDetails(id);
     return { props: { movie } };
   } else {
     throw new Error(&#39;Missing id parameter&#39;);
@@ -564,7 +576,7 @@ export default SSRMovieDetailsPage;
 </ul>
 <pre><code language="language-tsx" class="language-tsx">import Note from &#39;@/components/note/Note&#39;;
 import { Movie } from &#39;@/interfaces/movie.interface&#39;;
-import { getMovieDetails } from &#39;@/services/movie.service&#39;;
+import { fetchMovieDetails } from &#39;@/services/movie.service&#39;;
 import { GetServerSideProps, InferGetServerSidePropsType } from &#39;next&#39;;
 import Head from &#39;next/head&#39;;
 import Image from &#39;next/image&#39;;
@@ -624,13 +636,15 @@ const SSRMovieDetailsPage = ({
 // ...
 </code></pre>
 <p>Et enfin modifions la liste des films (<code>src/pages/ssr/index.tsx</code>) pour ajouter un lien vers la page de détail du film sur la carte <code>MovieCard</code>, en utilisant le composant <code>Link</code> de <code>,next/link</code>.</p>
-<pre><code language="language-ts" class="language-ts">{movies?.map((movie: Movie) =&gt; (
-  &lt;li key={movie.id}&gt;
-    &lt;Link href={`/ssr/${movie.id}`}&gt;
-      &lt;MovieCard movie={movie} /&gt;
-    &lt;/Link&gt;
-  &lt;/li&gt;
-))}
+<pre><code language="language-ts" class="language-ts">{
+  movies?.map((movie: Movie) =&gt; (
+    &lt;li key={movie.id}&gt;
+      &lt;Link href={`/ssr/${movie.id}`}&gt;
+        &lt;MovieCard movie={movie} /&gt;
+      &lt;/Link&gt;
+    &lt;/li&gt;
+  ));
+}
 </code></pre>
 <p>Vérifions dans l&#39;application qu&#39;on accède bien au détail d&#39;un film quand on clique sur sa vignette dans la liste des films.</p>
 <h2 is-upgraded>Gestion de favoris</h2>
@@ -702,7 +716,7 @@ export default Like;
 <pre><code language="language-tsx" class="language-tsx">import Like from &#39;@/components/like/Like&#39;;
 import Note from &#39;@/components/note/Note&#39;;
 import { Movie } from &#39;@/interfaces/movie.interface&#39;;
-import { getMovieDetails } from &#39;@/services/movie.service&#39;;
+import { fetchMovieDetails } from &#39;@/services/movie.service&#39;;
 import { GetServerSideProps, InferGetServerSidePropsType } from &#39;next&#39;;
 import Head from &#39;next/head&#39;;
 import Image from &#39;next/image&#39;;
@@ -746,18 +760,18 @@ import Image from &#39;next/image&#39;;
 <h2 is-upgraded>Liste des films</h2>
 <p>Comme dans l&#39;exercice précédent, nous aurons besoin de créer la page d&#39;affichage de la liste des films.</p>
 <p>Dans le répertoire <code>/src/pages/ssg</code> du projet, modifions le fichier <code>index.tsx</code>.</p>
-<p>Il sera très semblable au fichier <code>/src/pages/ssr</code>. La principale différence réside dans le remplacement de méthode  <code>getServerSideProps</code> par la méthode <code>getStaticProps</code>.</p>
+<p>Il sera très semblable au fichier <code>/src/pages/ssr</code>. La principale différence réside dans le remplacement de méthode <code>getServerSideProps</code> par la méthode <code>getStaticProps</code>.</p>
 <pre><code language="language-ts" class="language-ts">export const getStaticProps: GetStaticProps&lt;{
   movies: Movie[];
 }&gt; = async () =&gt; {
-  const { results: movies } = await getMovies();
+  const { results: movies } = await fetchPopularMovies();
   return { props: { movies } };
 };
 </code></pre>
 <p>Le reste du fichier est très semblable à ce qui a été fait pour le server side rendering : on passe la liste des films dans la props <code>movies</code> du composant et on parcourt cette liste.</p>
 <pre><code language="language-tsx" class="language-tsx">import MovieCard from &#39;@/components/movie/card/MovieCard&#39;;
 import { Movie } from &#39;@/interfaces/movie.interface&#39;;
-import { getMovies } from &#39;@/services/movie.service&#39;;
+import { fetchPopularMovies } from &#39;@/services/movie.service&#39;;
 import {
   GetServerSideProps,
   GetStaticProps,
@@ -774,8 +788,8 @@ const SSGPage = ({
       &lt;Head&gt;
         &lt;title&gt;Static Site Generation&lt;/title&gt;
       &lt;/Head&gt;
-      &lt;main className=&#34;lg:mx-44 mx-4 space-y-4 lg:pt-6 pt-14 pb-20&#34;&gt;
-        &lt;ul className=&#34;movies-list grid xl:grid-cols-4 lg:grid-cols-3 sm:grid-cols-2 grid-cols-1 gap-6&#34;&gt;
+      &lt;main className=&#34;main-container&#34;&gt;
+        &lt;ul className=&#34;movies-list&#34;&gt;
           {movies?.map((movie: Movie) =&gt; (
             &lt;li key={movie.id}&gt;
               &lt;Link href={`/ssg/${movie.id}`}&gt;
@@ -795,7 +809,7 @@ const SSGPage = ({
 export const getStaticProps: GetStaticProps&lt;{
   movies: Movie[];
 }&gt; = async () =&gt; {
-  const { results: movies } = await getMovies();
+  const { results: movies } = await fetchPopularMovies();
   return { props: { movies } };
 };
 
@@ -809,7 +823,7 @@ export default SSGPage;
   movie: Movie;
 }&gt; = async ({ params = {} }) =&gt; {
   const id = Number(params.id);
-  const movie = await getMovieDetails(id);
+  const movie = await fetchMovieDetails(id);
   return { props: { movie } };
 };
 </code></pre>
@@ -817,11 +831,11 @@ export default SSGPage;
 <pre><code language="language-ts" class="language-ts">import Like from &#39;@/components/like/Like&#39;;
 import Note from &#39;@/components/note/Note&#39;;
 import { Movie } from &#39;@/interfaces/movie.interface&#39;;
-import { getMovieDetails, getMovies } from &#39;@/services/movie.service&#39;;
 import {
-  GetStaticProps,
-  InferGetServerSidePropsType
-} from &#39;next&#39;;
+  fetchMovieDetails,
+  fetchPopularMovies,
+} from &#39;@/services/movie.service&#39;;
+import { GetStaticProps, InferGetServerSidePropsType } from &#39;next&#39;;
 import Head from &#39;next/head&#39;;
 import Image from &#39;next/image&#39;;
 
@@ -882,7 +896,7 @@ export const getStaticProps: GetStaticProps&lt;{
   movie: Movie;
 }&gt; = async ({ params = {} }) =&gt; {
   const id = Number(params.id);
-  const movie = await getMovieDetails(id);
+  const movie = await fetchMovieDetails(id);
   return { props: { movie } };
 };
 
@@ -892,13 +906,13 @@ export default SSGMovieDetailsPage;
 <pre><code language="language-ts" class="language-ts">import {
   GetStaticPaths,
   GetStaticProps,
-  InferGetServerSidePropsType
+  InferGetServerSidePropsType,
 } from &#39;next&#39;;
 
 // ...
 
 export const getStaticPaths: GetStaticPaths = async () =&gt; {
-  const { results: movies } = await getMovies();
+  const { results: movies } = await fetchPopularMovies();
   return {
     paths: movies.map((movie) =&gt; `/ssg/${movie.id}`),
     fallback: false,
@@ -928,7 +942,7 @@ export const getStaticPaths: GetStaticPaths = async () =&gt; {
 <pre><code language="language-tsx" class="language-tsx">import MovieCard from &#39;@/components/movie/card/MovieCard&#39;;
 import SearchBox from &#39;@/components/search/SearchBox&#39;;
 import { Movie } from &#39;@/interfaces/movie.interface&#39;;
-import { fetchMovies } from &#39;@/services/movie.service&#39;;
+import { fetchPopularMovies, searchMovies } from &#39;@/services/movie.service&#39;;
 
 export const revalidate = 0;
 
@@ -937,16 +951,25 @@ interface Props {
 }
 
 const RSCPage = async ({ searchParams }: Props) =&gt; {
-  const pathname = &#39;/rsc&#39;;
-  const { results: movies } = await fetchMovies(searchParams);
+  let movies: Movie[];
+
+  if (searchParams.query) {
+    const { results } = await searchMovies(searchParams.query as string);
+    movies = results;
+  } else {
+    const { results } = await fetchPopularMovies();
+    movies = results;
+  }
 
   return (
-    &lt;main className=&#34;lg:mx-44 mx-4 space-y-4 lg:pt-6 pt-14 pb-20&#34;&gt;
+    &lt;main className=&#34;main-container&#34;&gt;
       &lt;SearchBox /&gt;
-      &lt;ul className=&#34;movies-list grid xl:grid-cols-4 lg:grid-cols-3 sm:grid-cols-2 grid-cols-1 gap-6&#34;&gt;
+      &lt;ul className=&#34;movies-list&#34;&gt;
         {movies?.map((movie: Movie) =&gt; (
           &lt;li key={movie.id}&gt;
-            &lt;MovieCard movie={movie} pathname={pathname} /&gt;
+            &lt;Link href={`/rsc/${movie.id}`}&gt;
+              &lt;MovieCard movie={movie} /&gt;
+            &lt;/Link&gt;
           &lt;/li&gt;
         ))}
       &lt;/ul&gt;
@@ -968,11 +991,11 @@ export default RSCPage;
 <p>Comme précédement, nous pouvons directement faire un appel API dans notre composant serveur :</p>
 <pre><code language="language-tsx" class="language-tsx">import Like from &#39;@/components/like/Like&#39;;
 import Note from &#39;@/components/note/Note&#39;;
-import { getMovieDetails } from &#39;@/services/movie.service&#39;;
+import { fetchMovieDetails } from &#39;@/services/movie.service&#39;;
 import Image from &#39;next/image&#39;;
 
 const RSCMovieDetailsPage = async ({ params }: { params: { id: number } }) =&gt; {
-  const movie = await getMovieDetails(params.id);
+  const movie = await fetchMovieDetails(params.id);
 
   const posterUrl = `https://image.tmdb.org/t/p/w500/${movie.poster_path}`;
   const backdropPathUrl = `https://image.tmdb.org/t/p/original/${movie.backdrop_path}`;
@@ -1029,10 +1052,10 @@ export default RSCMovieDetailsPage;
 <li>Garder nos composants client</li>
 </ul>
 <p>Dans le répertoire <code>/src/services</code> du projet, modifions le fichier <code>movie.service.tsx</code>.</p>
-<p>Commençons par la méthode <code>getMovieDetails</code> en ajoutant <code>next: { revalidate: 604800 }</code></p>
-<pre><code language="language-tsx" class="language-tsx">const getMovieDetails = async (movieId: number): Promise&lt;Movie&gt; =&gt; {
+<p>Commençons par la méthode <code>fetchMovieDetails</code> en ajoutant <code>next: { revalidate: 604800 }</code></p>
+<pre><code language="language-tsx" class="language-tsx">const fetchMovieDetails = async (movieId: number): Promise&lt;Movie&gt; =&gt; {
   const queryParams = new URLSearchParams();
-  queryParams.append(QUERY_PARAMS.LANGUAGE, DEFAULT_PARAMS.LANGUAGE);
+  queryParams.append(&#39;language&#39;, &#39;fr-FR&#39;);
 
   const URL = `${
     process.env.NEXT_PUBLIC_API_URL
@@ -1073,12 +1096,12 @@ export default RSCMovieDetailsPage;
 import MovieReview from &#39;@/components/movie/review/MovieReview&#39;;
 import Note from &#39;@/components/note/Note&#39;;
 import { Review } from &#39;@/interfaces/review.interface&#39;;
-import { getMovieDetails, getMovieReviews } from &#39;@/services/movie.service&#39;;
+import { fetchMovieDetails, getMovieReviews } from &#39;@/services/movie.service&#39;;
 import Image from &#39;next/image&#39;;
 
 const RSCMovieDetailsPage = async ({ params }: { params: { id: number } }) =&gt; {
   const [movie, reviews] = await Promise.all([
-    getMovieDetails(params.id),
+    fetchMovieDetails(params.id),
     getMovieReviews(params.id),
   ]);
 
@@ -1091,7 +1114,7 @@ const RSCMovieDetailsPage = async ({ params }: { params: { id: number } }) =&gt;
       &lt;div className=&#34;flex flex-col gap-3 ml-4 text-white mt-3&#34;&gt;
         {/*  ...  */}
       &lt;/div&gt;
-      &lt;div className=&#34;grid lg:grid-cols-3 sm:grid-cols-2 grid-cols-1 gap-6 p-4&#34;&gt;
+      &lt;div className=&#34;reviews-list&#34;&gt;
         {reviews.map((review: Review) =&gt; (
           &lt;MovieReview key={review.id} review={review} /&gt;
         ))}
