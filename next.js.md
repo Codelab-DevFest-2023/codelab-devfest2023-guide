@@ -489,7 +489,13 @@ import Image from 'next/image';
 
 Nous allons créer un composant qui affiche un champ de recherche de films. Le terme recherché sera ajouté en tant que paramètre `query` dans l'url de la page : `http://localhost:3000/ssr?query=xxxx`.
 
-Le composant `SearchBox` est déjà fourni dans le fichier `/src/components/search/SearchBox.tsx`. Lors d'une recherche ce composant rappelle la route courante en passant le paramètre `query` dans l'url, en utilisant les hooks fournis par `next/navigation`. En tant que hooks ils s'exécutent côté client uniquement.
+Un squelette du composant `SearchBox` est déjà fourni dans le fichier `/src/components/search/SearchBox.tsx`. Nous allons compléter ce composant pour :
+- Gérer la valeur saisie dans le champ de recherche
+- Utiliser les hooks de navigation de Next.js pour rafraîchir la page en passant dans le paramètre `query` de l'url le terme recherché.
+
+Tout le code ajouté est basé sur des hooks et des méthodes événementielles, il ne s'exécutera donc que dans le browser, côté client.
+
+Voici le code du composant terminé :
 
 ```tsx
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
@@ -532,7 +538,7 @@ const SearchBox = () => {
 export default SearchBox;
 ```
 
-Ce paramètre `query` doit être récupéré côté serveur pour apper la bonne route d'API TMDB :
+Ce paramètre `query` doit être récupéré côté serveur pour appeler la bonne route d'API TMDB :
 
 - La route `search/movie` en cas de présence du paramètre `query`
 - La route `movie/popular` en cas d'absence du paramètre `query`
