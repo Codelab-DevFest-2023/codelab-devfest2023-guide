@@ -543,7 +543,7 @@ Ce paramètre `query` doit être récupéré côté serveur pour appeler la bonn
 - La route `search/movie` en cas de présence du paramètre `query`
 - La route `movie/popular` en cas d'absence du paramètre `query`
 
-Modifions donc la méthode `getServerSideProps` de la page `/src/pages/ssr/index.tsx` afin de récupérer le paramètre `query` et le passer à la méthode `fetchPopularMovies` :
+Modifions donc la méthode `getServerSideProps` de la page `/src/pages/ssr/index.tsx` afin de récupérer le paramètre `query` et le passer à la méthode `searchMovies` :
 
 ```tsx
 import MovieCard from '@/components/movie/card/MovieCard';
@@ -710,7 +710,7 @@ const SSRMovieDetailsPage = ({
 // ...
 ```
 
-Et enfin modifions la liste des films (`src/pages/ssr/index.tsx`) pour ajouter un lien vers la page de détail du film sur la carte `MovieCard`, en utilisant le composant `Link` de `,next/link`.
+Et enfin modifions la liste des films (`src/pages/ssr/index.tsx`) pour ajouter un lien vers la page de détail du film sur la carte `MovieCard`, en utilisant le composant `Link` de `next/link`.
 
 ```ts
 {
@@ -725,107 +725,6 @@ Et enfin modifions la liste des films (`src/pages/ssr/index.tsx`) pour ajouter u
 ```
 
 Vérifions dans l'application qu'on accède bien au détail d'un film quand on clique sur sa vignette dans la liste des films.
-
-### Gestion de favoris
-
-Pour terminer nous allons mettre en place la possibilité de gérer des films favoris à travers un composant `Like` présent dans la page de détail qui permet d'ajouter / enlever le film des favoris, stockés dans le local storage du navigateur. Le local storage n'étant disponible que côté client, il faudra s'assurer que notre code de gestion des favoris ne s'exécute que côté client.
-
-Dans le répertoire `/src/components/like` du projet, ouvrons le fichier `Like.tsx`.
-
-```tsx
-'use client';
-import { useEffect, useState } from 'react';
-import './like.module.css';
-
-interface Props {
-  id: number;
-}
-
-const Like = ({ id }: Props) => {
-  const [filled, setFilled] = useState(false);
-
-  useEffect(() => {
-    const favorites = localStorage.getItem('favorites');
-    if (favorites) {
-      const isFind = JSON.parse(favorites).find(
-        (element: { id: number }) => element.id === id
-      );
-      if (isFind) {
-        setFilled(true);
-      }
-    } else {
-      setFilled(false);
-    }
-  }, [id]);
-
-  const handleClick = () => {
-    const favorites = localStorage.getItem('favorites');
-    if (favorites) {
-      const favoritesList = JSON.parse(favorites);
-
-      const filterFav = favoritesList.filter(
-        (fav: { id: number }) => fav.id !== id
-      );
-
-      if (filterFav.length === favoritesList.length) {
-        setFilled(true);
-        favoritesList.push({ id: id });
-        localStorage.setItem('favorites', JSON.stringify(favoritesList));
-      } else {
-        setFilled(false);
-        localStorage.setItem('favorites', JSON.stringify(filterFav));
-      }
-    } else {
-      setFilled(true);
-      localStorage.setItem('favorites', JSON.stringify([{ id: id }]));
-    }
-  };
-
-  return (
-    <button
-      className={`heart-button ${filled ? 'filled' : ''}`}
-      onClick={handleClick}
-    >
-      <svg className="heart-icon" viewBox="0 0 26 26">
-        <path d="M12 21.35l-1.45-1.32C5.4 16.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C15.09 3.81 16.76 3 18.5 3 21.58 3 24 5.42 24 8.5c0 3.78-3.4 7.86-8.55 11.54L12 21.35z" />
-      </svg>
-    </button>
-  );
-};
-
-export default Like;
-```
-
-Il ne reste plus qu'à rajouter ce nouveau composant dans la page SSR (`/src/pages/ssr/[id].tsx`) :
-
-```tsx
-import Like from '@/components/like/Like';
-import Note from '@/components/note/Note';
-import { Movie } from '@/interfaces/movie.interface';
-import { fetchMovieDetails } from '@/services/movie.service';
-import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
-import Head from 'next/head';
-import Image from 'next/image';
-
-// ...
-<div className="relative flex flex-col">
-  <div className="flex flex-col gap-3 ml-4 text-white mt-3">
-    <h1 className="text-xl font-semibold">{movie.title}</h1>
-    <div className="flex gap-2">
-      {movie.genres.map((genre) => {
-        return <p key={genre.id}>{genre.name}</p>;
-      })}
-    </div>
-    <p>{movie.tagline}</p>
-    <p className="mt-2 mr-10">{movie.overview}</p>
-    <div className="flex items-center gap-3">
-      <Note note={movie.vote_average} />
-      <Like id={movie.id} />
-    </div>
-  </div>
-</div>;
-// ...
-```
 
 ### Observons ce qui se passe
 
@@ -934,7 +833,6 @@ export const getStaticProps: GetStaticProps<{
 Le reste du fichier est quasiment identique au server side rendering :
 
 ```ts
-import Like from '@/components/like/Like';
 import Note from '@/components/note/Note';
 import { Movie } from '@/interfaces/movie.interface';
 import {
@@ -988,7 +886,6 @@ const SSGMovieDetailsPage = ({
               <p className="mt-2 mr-10">{movie.overview}</p>
               <div className="flex items-center gap-3">
                 <Note note={movie.vote_average} />
-                <Like id={movie.id} />
               </div>
             </div>
           </div>
@@ -1118,7 +1015,6 @@ Dans le répertoire `/src/app/rsc/[id]` du projet, modifions le fichier `page.ts
 Comme précédement, nous pouvons directement faire un appel API dans notre composant serveur :
 
 ```tsx
-import Like from '@/components/like/Like';
 import Note from '@/components/note/Note';
 import { fetchMovieDetails } from '@/services/movie.service';
 import Image from 'next/image';
@@ -1162,7 +1058,6 @@ const RSCMovieDetailsPage = async ({ params }: { params: { id: number } }) => {
             <p className="mt-2 mr-10">{movie.overview}</p>
             <div className="flex items-center gap-3">
               <Note note={movie.vote_average} />
-              <Like id={movie.id} />
             </div>
           </div>
         </div>
@@ -1172,6 +1067,104 @@ const RSCMovieDetailsPage = async ({ params }: { params: { id: number } }) => {
 };
 
 export default RSCMovieDetailsPage;
+```
+
+### Gestion de favoris
+
+Nous allons mettre en place la possibilité de gérer des films favoris à travers un composant `Like` présent dans la page de détail qui permet d'ajouter / enlever le film des favoris, stockés dans le local storage du navigateur. Le local storage n'étant disponible que côté client, il faudra s'assurer que notre code de gestion des favoris ne s'exécute que côté client.
+
+Dans le répertoire `/src/components/like` du projet, ouvrons le fichier `Like.tsx`.
+
+```tsx
+'use client';
+import { useEffect, useState } from 'react';
+import './like.module.css';
+
+interface Props {
+  id: number;
+}
+
+const Like = ({ id }: Props) => {
+  const [filled, setFilled] = useState(false);
+
+  useEffect(() => {
+    const favorites = localStorage.getItem('favorites');
+    if (favorites) {
+      const isFind = JSON.parse(favorites).find(
+        (element: { id: number }) => element.id === id
+      );
+      if (isFind) {
+        setFilled(true);
+      }
+    } else {
+      setFilled(false);
+    }
+  }, [id]);
+
+  const handleClick = () => {
+    const favorites = localStorage.getItem('favorites');
+    if (favorites) {
+      const favoritesList = JSON.parse(favorites);
+
+      const filterFav = favoritesList.filter(
+        (fav: { id: number }) => fav.id !== id
+      );
+
+      if (filterFav.length === favoritesList.length) {
+        setFilled(true);
+        favoritesList.push({ id: id });
+        localStorage.setItem('favorites', JSON.stringify(favoritesList));
+      } else {
+        setFilled(false);
+        localStorage.setItem('favorites', JSON.stringify(filterFav));
+      }
+    } else {
+      setFilled(true);
+      localStorage.setItem('favorites', JSON.stringify([{ id: id }]));
+    }
+  };
+
+  return (
+    <button
+      className={`heart-button ${filled ? 'filled' : ''}`}
+      onClick={handleClick}
+    >
+      <svg className="heart-icon" viewBox="0 0 26 26">
+        <path d="M12 21.35l-1.45-1.32C5.4 16.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C15.09 3.81 16.76 3 18.5 3 21.58 3 24 5.42 24 8.5c0 3.78-3.4 7.86-8.55 11.54L12 21.35z" />
+      </svg>
+    </button>
+  );
+};
+
+export default Like;
+```
+
+Il ne reste plus qu'à rajouter ce nouveau composant dans la page RSC (`/src/app/rsc/[id]/page.tsx`) :
+
+```tsx
+import Like from '@/components/like/Like';
+import Note from '@/components/note/Note';
+import { fetchMovieDetails } from '@/services/movie.service';
+import Image from 'next/image';
+
+// ...
+<div className="relative flex flex-col">
+  <div className="flex flex-col gap-3 ml-4 text-white mt-3">
+    <h1 className="text-xl font-semibold">{movie.title}</h1>
+    <div className="flex gap-2">
+      {movie.genres.map((genre) => {
+        return <p key={genre.id}>{genre.name}</p>;
+      })}
+    </div>
+    <p>{movie.tagline}</p>
+    <p className="mt-2 mr-10">{movie.overview}</p>
+    <div className="flex items-center gap-3">
+      <Note note={movie.vote_average} />
+      <Like id={movie.id} />
+    </div>
+  </div>
+</div>;
+// ...
 ```
 
 ### Affichage des critiques de films
