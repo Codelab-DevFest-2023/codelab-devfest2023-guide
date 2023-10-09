@@ -227,7 +227,6 @@ export { useMovie, useMovies };
 </ul>
 <pre><code language="language-ts" class="language-ts">import { useParams } from &#39;react-router-dom&#39;;
 import { useMovie } from &#39;../../hooks/movies&#39;;
-import Like from &#39;../../components/like/Like&#39;;
 import Note from &#39;../../components/note/Note&#39;;
 
 const MovieDetailsPage = () =&gt; {
@@ -286,7 +285,6 @@ const MovieDetailsPage = () =&gt; {
                 &lt;p className=&#34;movie-overview&#34;&gt;{movie.overview}&lt;/p&gt;
                 &lt;div className=&#34;movie-note&#34;&gt;
                   &lt;Note note={movie.vote_average} /&gt;
-                  &lt;Like id={movie.id} /&gt;
                 &lt;/div&gt;
               &lt;/div&gt;
             &lt;/div&gt;
@@ -354,7 +352,7 @@ export default App;
 <aside class="warning"><p>Cet exercice utilisera le système de routage <strong>pages</strong> de Next.js.</p>
 </aside>
 <h2 is-upgraded>Création des variables d&#39;environnement</h2>
-<p>Comme dans l&#39;exercice précédent nous avons besoin de fournir des variables d&#39;environnement pour fournir la clé API nécessaire à l&#39;utilisation de l&#39;API TMDB. Créons un fichier <code>.env</code> à la racine du projet avec le contenu suivant et remplaçons par la même clé API que celle utilisée lors de l&#39;exercice précédent :</p>
+<p>Comme dans l&#39;exercice précédent nous avons besoin de fournir des variables d&#39;environnement pour fournir la clé API nécessaire à l&#39;utilisation de l&#39;API TMDB. Créons un fichier <code>.env.local</code> à la racine du projet avec le contenu suivant et remplaçons par la même clé API que celle utilisée lors de l&#39;exercice précédent :</p>
 <pre><code>NEXT_PUBLIC_API_URL=https://api.themoviedb.org/3
 NEXT_PUBLIC_API_KEY=eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIxNTk0NTM5OGIxMzZhODZhZDU4ZjE3MmFlYTQ3ZTNjZCIsInN1YiI6IjVlNzkxY2Y0MzU3YzAwMDAxMTU0MDAwZSIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.8XGXQO22Mv8UaooWf0sDnUWRpNTdlzuO5rZClx-eEDc
 </code></pre>
@@ -417,7 +415,7 @@ const SSRPage = ({
 <p>Nous pouvons démarrer l&#39;application avec la commande <code>npm run dev</code> et constater que la liste des films s&#39;affiche correctement à l&#39;adresse <code>http://localhost:3000/ssr</code>.</p>
 <h2 is-upgraded>Optimisations des images</h2>
 <p>Afin d&#39;optimiser l&#39;affichage des images sur l&#39;application, nous allons utiliser le composant <code>Image</code> de Next.js.</p>
-<p>Ce composant intègre des optimisations sur la gestion des images pour améliorer l&#39;expérience utilisateur et l&#39;expérience développeir : chargement en mode lazy, chargement prioritaire, gestion du responsive, etc...</p>
+<p>Ce composant intègre des optimisations sur la gestion des images pour améliorer l&#39;expérience utilisateur et l&#39;expérience développeur : chargement en mode lazy, chargement prioritaire, gestion du responsive, etc...</p>
 <p>Dans le répertoire <code>/src/components/movie/card</code> du projet, ouvrons le composant <code>MovieCard</code>.</p>
 <p>Remplaçons le composant <code>img</code> par un composant <code>Image</code> :</p>
 <pre><code language="language-tsx" class="language-tsx">import Image from &#39;next/image&#39;;
@@ -545,6 +543,7 @@ import Link from &#39;next/link&#39;;
 &lt;/&gt;;
 // ...
 </code></pre>
+<p>Nous pouvons redémarrer l&#39;application avec la commande <code>npm run dev</code> et constater que la recherche s&#39;effectue correctement à l&#39;adresse <code>http://localhost:3000/ssr</code>.</p>
 <h2 is-upgraded>Détail d&#39;un film</h2>
 <p>Nous allons ensuite créer une page affichant le détail de chaque film.</p>
 <p>Dans le répertoire <code>/src/pages/ssr</code> du projet, modifions le fichier <code>[id].tsx</code></p>
@@ -840,8 +839,7 @@ export const getStaticPaths: GetStaticPaths = async () =&gt; {
       </google-codelab-step>
     
       <google-codelab-step label="React Server Components" duration="25">
-        <p>TODO On devrait avoir des problèmes car pas de &#34;use client&#34;</p>
-<aside class="special"><p>Si vous n&#39;avez pas eu le temps de finir l&#39;étape précédente, vous pouvez faire un checkout de la branche &#34;ssg-end&#34; pour débuter cette étape : <code>git checkout -f ssg-end</code></p>
+        <aside class="special"><p>Si vous n&#39;avez pas eu le temps de finir l&#39;étape précédente, vous pouvez faire un checkout de la branche &#34;ssg-end&#34; pour débuter cette étape : <code>git checkout -f ssg-end</code></p>
 </aside>
 <p>Dans cette quatrième et dernière partie, nous allons développer la même application que précédement mais en utilisant les React Server Components, toujours en s&#39;appuyant sur Next.js et Tailwind.</p>
 <aside class="warning"><p>Cet exercice utilisera le routage <strong>app</strong> (Next.js &gt; 13).</p>
@@ -854,6 +852,7 @@ export const getStaticPaths: GetStaticPaths = async () =&gt; {
 import SearchBox from &#39;@/components/search/SearchBox&#39;;
 import { Movie } from &#39;@/interfaces/movie.interface&#39;;
 import { fetchPopularMovies, searchMovies } from &#39;@/services/movie.service&#39;;
+import Link from &#39;next/link&#39;;
 
 export const revalidate = 0;
 
@@ -895,7 +894,17 @@ export default RSCPage;
 </code></pre>
 <aside class="special"><p>Le code <strong>export const revalidate = 0;</strong> est un mécanisme qui permet de mettre en cache les données générées côté serveur (SSR) pendant une période spécifiée. En mettant revalidate à zéro (0), cela signifie que les données seront générées à chaque demande sans mise en cache ni expiration. </p>
 </aside>
-<p>Nous pouvons démarrer l&#39;application avec la commande <code>npm run dev</code> et constater que la liste des films s&#39;affiche correctement à l&#39;adresse <code>http://localhost:3000/rsc</code>.</p>
+<p>Nous pouvons redémarrer l&#39;application avec la commande <code>npm run dev</code> et constater que la liste des films s&#39;affiche correctement à l&#39;adresse <code>http://localhost:3000/rsc</code>.</p>
+<aside class="warning"><p> Lors du lancement de l&#39;application, vous devriez avoir une error Nextjs. Dans Next.js version &gt; 13, <strong>&#34;use client&#34;</strong> est toujours nécessaire lorsque le composant est rendu sur le client </p>
+</aside>
+<p>Il est impératif de spécifier ‘use client&#39; dans le fichier <code>/src/components/search/SearchBox.tsx</code>.</p>
+<pre><code language="language-tsx" class="language-tsx">&#39;use client&#39;;
+import { usePathname, useRouter, useSearchParams } from &#39;next/navigation&#39;;
+import { ChangeEvent, useState } from &#39;react&#39;;
+
+const SearchBox = () =&gt; {
+// ...
+</code></pre>
 <h2 is-upgraded>Détail d&#39;un film</h2>
 <p>Ensuite, nous allons créer un écran affichant le détail de chaque film.</p>
 <p>Dans le répertoire <code>/src/app/rsc/[id]</code> du projet, modifions le fichier <code>page.tsx</code>.</p>
@@ -1043,6 +1052,7 @@ import Image from &#39;next/image&#39;;
 &lt;/div&gt;;
 // ...
 </code></pre>
+<p>Nous pouvons redémarrer l&#39;application avec la commande <code>npm run dev</code> et vérifier le bon comportement de notre nouveau composant.</p>
 <h2 is-upgraded>Affichage des critiques de films</h2>
 <p>Afin de tirer partie de la force des React Server Components, nous allons afficher les critiques du film sur la page de détail. Nous allons :</p>
 <ul>
@@ -1071,8 +1081,8 @@ import Image from &#39;next/image&#39;;
   return result.json();
 };
 </code></pre>
-<p>Et la méthode <code>getMovieReviews</code> en ajoutant <code>cache: 'no-store'</code></p>
-<pre><code language="language-tsx" class="language-tsx">const getMovieReviews = async (movieId: number): Promise&lt;Review[]&gt; =&gt; {
+<p>Et la méthode <code>fetchMovieReviews</code> en ajoutant <code>cache: 'no-store'</code></p>
+<pre><code language="language-tsx" class="language-tsx">const fetchMovieReviews = async (movieId: number): Promise&lt;Review[]&gt; =&gt; {
   const URL = `${process.env.NEXT_PUBLIC_API_URL}/movie/${movieId}/reviews`;
 
   const result = await fetch(`${URL}`, {
@@ -1090,22 +1100,34 @@ import Image from &#39;next/image&#39;;
   return reviews;
 };
 </code></pre>
-<p>Maintenant, nous pouvons rajouter la gestion des critiques sur notre page de détail :</p>
+<p>Maintenant, nous pouvons rajouter la gestion des critiques sur notre page de détail. D&#39;abord en appelant la méthode <code>fetchMovieReviews</code> :</p>
 <pre><code language="language-tsx" class="language-tsx">import Like from &#39;@/components/like/Like&#39;;
 import MovieReview from &#39;@/components/movie/review/MovieReview&#39;;
 import Note from &#39;@/components/note/Note&#39;;
 import { Review } from &#39;@/interfaces/review.interface&#39;;
-import { fetchMovieDetails, getMovieReviews } from &#39;@/services/movie.service&#39;;
+import { fetchMovieDetails, fetchMovieReviews } from &#39;@/services/movie.service&#39;;
 import Image from &#39;next/image&#39;;
 
 const RSCMovieDetailsPage = async ({ params }: { params: { id: number } }) =&gt; {
   const [movie, reviews] = await Promise.all([
     fetchMovieDetails(params.id),
-    getMovieReviews(params.id),
+    fetchMovieReviews(params.id),
   ]);
 
-  const posterUrl = `https://image.tmdb.org/t/p/w500/${movie.poster_path}`;
-  const backdropPathUrl = `https://image.tmdb.org/t/p/original/${movie.backdrop_path}`;
+  // ...
+
+export default RSCMovieDetailsPage;
+</code></pre>
+<p>Et enfin, en ajoutant le composant <code>MovieReview</code> :</p>
+<pre><code language="language-tsx" class="language-tsx">import Like from &#39;@/components/like/Like&#39;;
+import MovieReview from &#39;@/components/movie/review/MovieReview&#39;;
+import Note from &#39;@/components/note/Note&#39;;
+import { Review } from &#39;@/interfaces/review.interface&#39;;
+import { fetchMovieDetails, fetchMovieReviews } from &#39;@/services/movie.service&#39;;
+import Image from &#39;next/image&#39;;
+
+const RSCMovieDetailsPage = async ({ params }: { params: { id: number } }) =&gt; {
+  // ...
 
   return (
     // ...
@@ -1120,14 +1142,14 @@ const RSCMovieDetailsPage = async ({ params }: { params: { id: number } }) =&gt;
     // ...
   );
 };
-
-export default RSCMovieDetailsPage;
 </code></pre>
+<p>Nous pouvons redémarrer l&#39;application avec la commande <code>npm run dev</code> et constater que les critiques des films s&#39;affichent correctement.</p>
 <h2 is-upgraded>Observons ce qui se passe</h2>
 <p>Ouvrons les devtools de Chrome (ou équivalent) pour observer :</p>
 <ul>
 <li>Les chargements de fichiers Javascript</li>
 <li>Les appels de service REST</li>
+<li>La gestion du cache dans les logs</li>
 </ul>
 
 

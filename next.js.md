@@ -69,10 +69,14 @@ eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIyZmMxMDQ0YjI0ZDdkYjcyY2RlZmJmNTBkNTkyNzhiYyIsInN
 Clé 2 :
 
 ```
-eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIyZmMxMDQ0YjI0ZDdkYjcyY2RlZmJmNTBkNTkyNzhiYyIsInN1YiI6IjY0YzU2ZTgyNjNhNjk1MDEwMzk5Y2I0YiIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.Rc42SZEbnqH6PvJRj1GAVYTADLcR5vNzArE1P333_dI
+eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIxNTk0NTM5OGIxMzZhODZhZDU4ZjE3MmFlYTQ3ZTNjZCIsInN1YiI6IjVlNzkxY2Y0MzU3YzAwMDAxMTU0MDAwZSIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.8XGXQO22Mv8UaooWf0sDnUWRpNTdlzuO5rZClx-eEDc
 ```
 
-TODO Ajouter d'autres clés
+Clé 3 :
+
+```
+eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJmNTA3Yzc1MTA3MWQyZjkzZTRiMTU2Mzg4NzY3NjEwMSIsInN1YiI6IjY1MjNmYzBjNzQ1MDdkMDBlMjEzYjMxNiIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.7Ge2En8f5fq1Iq1MyzIKPUL1ITqaDECKYhsi8UqSucQ
+```
 
 ### Liste des 20 films les plus populaires
 
@@ -244,7 +248,6 @@ Puis modifions le fichier `/src/pages/movies/MovieDetailsPage.tsx` :
 ```ts
 import { useParams } from 'react-router-dom';
 import { useMovie } from '../../hooks/movies';
-import Like from '../../components/like/Like';
 import Note from '../../components/note/Note';
 
 const MovieDetailsPage = () => {
@@ -303,7 +306,6 @@ const MovieDetailsPage = () => {
                 <p className="movie-overview">{movie.overview}</p>
                 <div className="movie-note">
                   <Note note={movie.vote_average} />
-                  <Like id={movie.id} />
                 </div>
               </div>
             </div>
@@ -384,7 +386,7 @@ Pour cette partie et les suivantes nous travaillerons dans le répertoire `codel
 
 ### Création des variables d'environnement
 
-Comme dans l'exercice précédent nous avons besoin de fournir des variables d'environnement pour fournir la clé API nécessaire à l'utilisation de l'API TMDB. Créons un fichier `.env` à la racine du projet avec le contenu suivant et remplaçons par la même clé API que celle utilisée lors de l'exercice précédent :
+Comme dans l'exercice précédent nous avons besoin de fournir des variables d'environnement pour fournir la clé API nécessaire à l'utilisation de l'API TMDB. Créons un fichier `.env.local` à la racine du projet avec le contenu suivant et remplaçons par la même clé API que celle utilisée lors de l'exercice précédent :
 
 ```
 NEXT_PUBLIC_API_URL=https://api.themoviedb.org/3
@@ -462,7 +464,7 @@ Nous pouvons démarrer l'application avec la commande `npm run dev` et constater
 
 Afin d'optimiser l'affichage des images sur l'application, nous allons utiliser le composant `Image` de Next.js.
 
-Ce composant intègre des optimisations sur la gestion des images pour améliorer l'expérience utilisateur et l'expérience développeir : chargement en mode lazy, chargement prioritaire, gestion du responsive, etc...
+Ce composant intègre des optimisations sur la gestion des images pour améliorer l'expérience utilisateur et l'expérience développeur : chargement en mode lazy, chargement prioritaire, gestion du responsive, etc...
 
 Dans le répertoire `/src/components/movie/card` du projet, ouvrons le composant `MovieCard`.
 
@@ -606,6 +608,8 @@ import Link from 'next/link';
 </>;
 // ...
 ```
+
+Nous pouvons redémarrer l'application avec la commande `npm run dev` et constater que la recherche s'effectue correctement à l'adresse `http://localhost:3000/ssr`.
 
 ### Détail d'un film
 
@@ -938,8 +942,6 @@ Exécutons ensuite la commande `npm run start` pour lancer l'application. Le ré
 
 ## React Server Components
 
-TODO On devrait avoir des problèmes car pas de "use client"
-
 Duration: 25:00
 
 <aside>Si vous n'avez pas eu le temps de finir l'étape précédente, vous pouvez faire un checkout de la branche "ssg-end" pour débuter cette étape : <code>git checkout -f ssg-end</code></aside>
@@ -961,6 +963,7 @@ import MovieCard from '@/components/movie/card/MovieCard';
 import SearchBox from '@/components/search/SearchBox';
 import { Movie } from '@/interfaces/movie.interface';
 import { fetchPopularMovies, searchMovies } from '@/services/movie.service';
+import Link from 'next/link';
 
 export const revalidate = 0;
 
@@ -1005,7 +1008,23 @@ export default RSCPage;
 En mettant revalidate à zéro (0), cela signifie que les données seront générées à chaque demande sans mise en cache ni expiration.
 </aside>
 
-Nous pouvons démarrer l'application avec la commande `npm run dev` et constater que la liste des films s'affiche correctement à l'adresse `http://localhost:3000/rsc`.
+Nous pouvons redémarrer l'application avec la commande `npm run dev` et constater que la liste des films s'affiche correctement à l'adresse `http://localhost:3000/rsc`.
+
+<aside class="negative">
+Lors du lancement de l'application, vous devriez avoir une error Nextjs.
+Avec la version 13, <strong>"use client"</strong> est toujours nécessaire lorsque le composant est rendu sur le client
+</aside>
+
+Il est impératif de spécifier 'use client' dans le fichier `/src/components/search/SearchBox.tsx`.
+
+```tsx
+'use client';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { ChangeEvent, useState } from 'react';
+
+const SearchBox = () => {
+// ...
+```
 
 ### Détail d'un film
 
@@ -1168,6 +1187,8 @@ import Image from 'next/image';
 // ...
 ```
 
+Nous pouvons redémarrer l'application avec la commande `npm run dev` et vérifier le bon comportement de notre nouveau composant.
+
 ### Affichage des critiques de films
 
 Afin de tirer partie de la force des React Server Components, nous allons afficher les critiques du film sur la page de détail.
@@ -1202,10 +1223,10 @@ const fetchMovieDetails = async (movieId: number): Promise<Movie> => {
 };
 ```
 
-Et la méthode `getMovieReviews` en ajoutant `cache: 'no-store'`
+Et la méthode `fetchMovieReviews` en ajoutant `cache: 'no-store'`
 
 ```tsx
-const getMovieReviews = async (movieId: number): Promise<Review[]> => {
+const fetchMovieReviews = async (movieId: number): Promise<Review[]> => {
   const URL = `${process.env.NEXT_PUBLIC_API_URL}/movie/${movieId}/reviews`;
 
   const result = await fetch(`${URL}`, {
@@ -1224,24 +1245,40 @@ const getMovieReviews = async (movieId: number): Promise<Review[]> => {
 };
 ```
 
-Maintenant, nous pouvons rajouter la gestion des critiques sur notre page de détail :
+Maintenant, nous pouvons rajouter la gestion des critiques sur notre page de détail.
+D'abord en appelant la méthode `fetchMovieReviews` :
 
 ```tsx
 import Like from '@/components/like/Like';
 import MovieReview from '@/components/movie/review/MovieReview';
 import Note from '@/components/note/Note';
 import { Review } from '@/interfaces/review.interface';
-import { fetchMovieDetails, getMovieReviews } from '@/services/movie.service';
+import { fetchMovieDetails, fetchMovieReviews } from '@/services/movie.service';
 import Image from 'next/image';
 
 const RSCMovieDetailsPage = async ({ params }: { params: { id: number } }) => {
   const [movie, reviews] = await Promise.all([
     fetchMovieDetails(params.id),
-    getMovieReviews(params.id),
+    fetchMovieReviews(params.id),
   ]);
 
-  const posterUrl = `https://image.tmdb.org/t/p/w500/${movie.poster_path}`;
-  const backdropPathUrl = `https://image.tmdb.org/t/p/original/${movie.backdrop_path}`;
+  // ...
+
+export default RSCMovieDetailsPage;
+```
+
+Et enfin, en ajoutant le composant `MovieReview` :
+
+```tsx
+import Like from '@/components/like/Like';
+import MovieReview from '@/components/movie/review/MovieReview';
+import Note from '@/components/note/Note';
+import { Review } from '@/interfaces/review.interface';
+import { fetchMovieDetails, fetchMovieReviews } from '@/services/movie.service';
+import Image from 'next/image';
+
+const RSCMovieDetailsPage = async ({ params }: { params: { id: number } }) => {
+  // ...
 
   return (
     // ...
@@ -1256,9 +1293,9 @@ const RSCMovieDetailsPage = async ({ params }: { params: { id: number } }) => {
     // ...
   );
 };
-
-export default RSCMovieDetailsPage;
 ```
+
+Nous pouvons redémarrer l'application avec la commande `npm run dev` et constater que les critiques des films s'affichent correctement.
 
 ### Observons ce qui se passe
 
@@ -1266,4 +1303,5 @@ Ouvrons les devtools de Chrome (ou équivalent) pour observer :
 
 - Les chargements de fichiers Javascript
 - Les appels de service REST
+- La gestion du cache dans les logs
 
