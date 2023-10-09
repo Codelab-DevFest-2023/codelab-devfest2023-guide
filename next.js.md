@@ -78,6 +78,12 @@ Clé 3 :
 eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJmNTA3Yzc1MTA3MWQyZjkzZTRiMTU2Mzg4NzY3NjEwMSIsInN1YiI6IjY1MjNmYzBjNzQ1MDdkMDBlMjEzYjMxNiIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.7Ge2En8f5fq1Iq1MyzIKPUL1ITqaDECKYhsi8UqSucQ
 ```
 
+Clé 4 :
+
+```
+eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIyYjIxMDJiZjVhNDJlNmI4YmE5MTc0ZDFmY2ZjMzE1NCIsInN1YiI6IjY1MjNmZmRhMGNiMzM1MTZmNWM1ZWJmYSIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.e_DyQRJhs1aK8FPXbM-dgn025D-Xp2M9fXQ1GdEYGjw
+```
+
 ### Liste des 20 films les plus populaires
 
 Pour commencer, nous allons créer une page affichant la liste des 20 films les plus populaires du moment. Nous avons donc besoin de créer :
