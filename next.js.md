@@ -181,16 +181,16 @@ Il ne reste plus qu'à rajouter un accès vers notre nouvelle route dans le fich
 
 ```ts
 // ...
-          <span className="hidden sm:block text-white font-semibold leading-6 xl:text-lg text-base">
+          <span className="header-title">
             Rendu front, action !
           </span>
         </a>
 
-        <ul className="text-white grid lg:grid-cols-3 sm:grid-cols-2 grid-cols-1 gap-4">
+        <ul className="header-item">
           <li>
             <Link
               to="/movies"
-              className="flex items-center gap-2 font-semibold leading-6 xl:text-lg text-base"
+              className="header-link"
             >
               Liste des films
             </Link>
@@ -261,7 +261,7 @@ const MovieDetailsPage = () => {
   const backdropPathUrl = `https://image.tmdb.org/t/p/original/${movie?.backdrop_path}`;
 
   return (
-    <div className="flex md:flex-row flex-col">
+    <div className="details-page">
       {isError && (
         <div>
           <p className="text-red mb-4">
@@ -275,33 +275,33 @@ const MovieDetailsPage = () => {
       {isFetching && <p>Chargement...</p>}
       {isFetched && movie && (
         <>
-          <div className="poster z-10 md:order-first order-last">
+          <div className="poster">
             <img
               src={posterUrl}
               alt={movie.title}
-              className="aspect-[2/3] object-cover h-full"
+              className="poster-image"
               height={750}
               width={500}
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
             />
           </div>
-          <div className="description relative w-full">
+          <div className="relative-full">
             <img
-              className="absolute z-0 object-cover h-full w-[inherit] brightness-50"
+              className="movie-backdrop"
               alt={movie.title}
               src={backdropPathUrl}
             />
-            <div className="relative flex flex-col">
-              <div className="flex flex-col gap-3 ml-4 text-white mt-3">
-                <h1 className="text-xl font-semibold">{movie.title}</h1>
-                <div className="flex gap-2">
+            <div className="movie-description">
+              <div className="informations">
+                <h1 className="movie-title">{movie.title}</h1>
+                <div className="movie-genre">
                   {movie.genres.map((genre) => {
                     return <p key={genre.id}>{genre.name}</p>;
                   })}
                 </div>
                 <p>{movie.tagline}</p>
-                <p className="mt-2 mr-10">{movie.overview}</p>
-                <div className="flex items-center gap-3">
+                <p className="movie-overview">{movie.overview}</p>
+                <div className="movie-note">
                   <Note note={movie.vote_average} />
                   <Like id={movie.id} />
                 </div>
@@ -476,7 +476,7 @@ import Image from 'next/image';
 <Image
   src={posterUrl}
   alt={movie.title}
-  className="rounded-t-lg aspect-[2/3] object-cover"
+  className="movie-poster"
   height={750}
   width={500}
   sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
@@ -490,6 +490,7 @@ import Image from 'next/image';
 Nous allons créer un composant qui affiche un champ de recherche de films. Le terme recherché sera ajouté en tant que paramètre `query` dans l'url de la page : `http://localhost:3000/ssr?query=xxxx`.
 
 Un squelette du composant `SearchBox` est déjà fourni dans le fichier `/src/components/search/SearchBox.tsx`. Nous allons compléter ce composant pour :
+
 - Gérer la valeur saisie dans le champ de recherche
 - Utiliser les hooks de navigation de Next.js pour rafraîchir la page en passant dans le paramètre `query` de l'url le terme recherché.
 
@@ -666,37 +667,37 @@ const SSRMovieDetailsPage = ({
       <Head>
         <title>Server Side Rendering</title>
       </Head>
-      <div className="flex md:flex-row flex-col">
-        <div className="poster z-10 md:order-first order-last">
+      <div className="details-page">
+        <div className="poster">
           <Image
             src={posterUrl}
             alt={movie.title}
-            className="aspect-[2/3] object-cover h-full"
+            className="poster-image"
             height={750}
             width={500}
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
             priority
           />
         </div>
-        <div className="description relative w-full">
+        <div className="relative-full">
           <Image
-            className="block z-0 object-cover brightness-50"
+            className="movie-backdrop"
             alt={movie.title}
             src={backdropPathUrl}
             fill
             priority
           />
-          <div className="relative flex flex-col">
-            <div className="flex flex-col gap-3 ml-4 text-white mt-3">
-              <h1 className="text-xl font-semibold">{movie.title}</h1>
-              <div className="flex gap-2">
+          <div className="movie-description">
+            <div className="informations">
+              <h1 className="movie-title">{movie.title}</h1>
+              <div className="movie-genre">
                 {movie.genres.map((genre) => {
                   return <p key={genre.id}>{genre.name}</p>;
                 })}
               </div>
               <p>{movie.tagline}</p>
-              <p className="mt-2 mr-10">{movie.overview}</p>
-              <div className="flex items-center gap-3">
+              <p className="movie-overview">{movie.overview}</p>
+              <div className="movie-note">
                 <Note note={movie.vote_average} />
               </div>
             </div>
@@ -854,37 +855,37 @@ const SSGMovieDetailsPage = ({
       <Head>
         <title>Static Site Generation</title>
       </Head>
-      <div className="flex md:flex-row flex-col">
-        <div className="poster z-10 md:order-first order-last">
+      <div className="details-page">
+        <div className="poster">
           <Image
             src={posterUrl}
             alt={movie.title}
-            className="aspect-[2/3] object-cover h-full"
+            className="poster-image"
             height={750}
             width={500}
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
             priority
           />
         </div>
-        <div className="description relative w-full">
+        <div className="relative-full">
           <Image
-            className="block z-0 object-cover brightness-50"
+            className="movie-backdrop"
             alt={movie.title}
             src={backdropPathUrl}
             fill
             priority
           />
-          <div className="relative flex flex-col">
-            <div className="flex flex-col gap-3 ml-4 text-white mt-3">
-              <h1 className="text-xl font-semibold">{movie.title}</h1>
-              <div className="flex gap-2">
+          <div className="movie-description">
+            <div className="informations">
+              <h1 className="movie-title">{movie.title}</h1>
+              <div className="movie-genre">
                 {movie.genres.map((genre) => {
                   return <p key={genre.id}>{genre.name}</p>;
                 })}
               </div>
               <p>{movie.tagline}</p>
-              <p className="mt-2 mr-10">{movie.overview}</p>
-              <div className="flex items-center gap-3">
+              <p className="movie-overview">{movie.overview}</p>
+              <div className="movie-note">
                 <Note note={movie.vote_average} />
               </div>
             </div>
@@ -1026,37 +1027,37 @@ const RSCMovieDetailsPage = async ({ params }: { params: { id: number } }) => {
   const backdropPathUrl = `https://image.tmdb.org/t/p/original/${movie.backdrop_path}`;
 
   return (
-    <main className="flex md:flex-row flex-col">
-      <div className="poster z-10 md:order-first order-last">
+    <main className="details-page">
+      <div className="poster">
         <Image
           src={posterUrl}
           alt={movie.title}
-          className="aspect-[2/3] object-cover h-full"
+          className="poster-image"
           height={750}
           width={500}
           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
           priority
         />
       </div>
-      <div className="description relative w-full">
+      <div className="relative-full">
         <Image
-          className="block z-0 object-cover brightness-50"
+          className="movie-backdrop"
           alt={movie.title}
           src={backdropPathUrl}
           fill
           priority
         />
-        <div className="relative flex flex-col">
-          <div className="flex flex-col gap-3 ml-4 text-white mt-3">
-            <h1 className="text-xl font-semibold">{movie.title}</h1>
-            <div className="flex gap-2">
+        <div className="movie-description">
+          <div className="informations">
+            <h1 className="movie-title">{movie.title}</h1>
+            <div className="movie-genre">
               {movie.genres.map((genre) => {
                 return <p key={genre.id}>{genre.name}</p>;
               })}
             </div>
             <p>{movie.tagline}</p>
-            <p className="mt-2 mr-10">{movie.overview}</p>
-            <div className="flex items-center gap-3">
+            <p className="movie-overview">{movie.overview}</p>
+            <div className="movie-note">
               <Note note={movie.vote_average} />
             </div>
           </div>
@@ -1148,17 +1149,17 @@ import { fetchMovieDetails } from '@/services/movie.service';
 import Image from 'next/image';
 
 // ...
-<div className="relative flex flex-col">
-  <div className="flex flex-col gap-3 ml-4 text-white mt-3">
-    <h1 className="text-xl font-semibold">{movie.title}</h1>
-    <div className="flex gap-2">
+<div className="movie-description">
+  <div className="informations">
+    <h1 className="movie-title">{movie.title}</h1>
+    <div className="movie-genre">
       {movie.genres.map((genre) => {
         return <p key={genre.id}>{genre.name}</p>;
       })}
     </div>
     <p>{movie.tagline}</p>
-    <p className="mt-2 mr-10">{movie.overview}</p>
-    <div className="flex items-center gap-3">
+    <p className="movie-overview">{movie.overview}</p>
+    <div className="movie-note">
       <Note note={movie.vote_average} />
       <Like id={movie.id} />
     </div>
@@ -1244,10 +1245,8 @@ const RSCMovieDetailsPage = async ({ params }: { params: { id: number } }) => {
 
   return (
     // ...
-    <div className="relative flex flex-col">
-      <div className="flex flex-col gap-3 ml-4 text-white mt-3">
-        {/*  ...  */}
-      </div>
+    <div className="movie-description">
+      <div className="informations">{/*  ...  */}</div>
       <div className="reviews-list">
         {reviews.map((review: Review) => (
           <MovieReview key={review.id} review={review} />

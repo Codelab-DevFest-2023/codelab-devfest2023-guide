@@ -171,16 +171,16 @@ export default App;
 </code></pre>
 <p>Il ne reste plus qu&#39;à rajouter un accès vers notre nouvelle route dans le fichier <code>/src/components/header/Header.tsx</code></p>
 <pre><code language="language-ts" class="language-ts">// ...
-          &lt;span className=&#34;hidden sm:block text-white font-semibold leading-6 xl:text-lg text-base&#34;&gt;
+          &lt;span className=&#34;header-title&#34;&gt;
             Rendu front, action !
           &lt;/span&gt;
         &lt;/a&gt;
 
-        &lt;ul className=&#34;text-white grid lg:grid-cols-3 sm:grid-cols-2 grid-cols-1 gap-4&#34;&gt;
+        &lt;ul className=&#34;header-item&#34;&gt;
           &lt;li&gt;
             &lt;Link
               to=&#34;/movies&#34;
-              className=&#34;flex items-center gap-2 font-semibold leading-6 xl:text-lg text-base&#34;
+              className=&#34;header-link&#34;
             &gt;
               Liste des films
             &lt;/Link&gt;
@@ -244,7 +244,7 @@ const MovieDetailsPage = () =&gt; {
   const backdropPathUrl = `https://image.tmdb.org/t/p/original/${movie?.backdrop_path}`;
 
   return (
-    &lt;div className=&#34;flex md:flex-row flex-col&#34;&gt;
+    &lt;div className=&#34;details-page&#34;&gt;
       {isError &amp;&amp; (
         &lt;div&gt;
           &lt;p className=&#34;text-red mb-4&#34;&gt;
@@ -258,33 +258,33 @@ const MovieDetailsPage = () =&gt; {
       {isFetching &amp;&amp; &lt;p&gt;Chargement...&lt;/p&gt;}
       {isFetched &amp;&amp; movie &amp;&amp; (
         &lt;&gt;
-          &lt;div className=&#34;poster z-10 md:order-first order-last&#34;&gt;
+          &lt;div className=&#34;poster&#34;&gt;
             &lt;img
               src={posterUrl}
               alt={movie.title}
-              className=&#34;aspect-[2/3] object-cover h-full&#34;
+              className=&#34;poster-image&#34;
               height={750}
               width={500}
               sizes=&#34;(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw&#34;
             /&gt;
           &lt;/div&gt;
-          &lt;div className=&#34;description relative w-full&#34;&gt;
+          &lt;div className=&#34;relative-full&#34;&gt;
             &lt;img
-              className=&#34;absolute z-0 object-cover h-full w-[inherit] brightness-50&#34;
+              className=&#34;movie-backdrop&#34;
               alt={movie.title}
               src={backdropPathUrl}
             /&gt;
-            &lt;div className=&#34;relative flex flex-col&#34;&gt;
-              &lt;div className=&#34;flex flex-col gap-3 ml-4 text-white mt-3&#34;&gt;
-                &lt;h1 className=&#34;text-xl font-semibold&#34;&gt;{movie.title}&lt;/h1&gt;
-                &lt;div className=&#34;flex gap-2&#34;&gt;
+            &lt;div className=&#34;movie-description&#34;&gt;
+              &lt;div className=&#34;informations&#34;&gt;
+                &lt;h1 className=&#34;movie-title&#34;&gt;{movie.title}&lt;/h1&gt;
+                &lt;div className=&#34;movie-genre&#34;&gt;
                   {movie.genres.map((genre) =&gt; {
                     return &lt;p key={genre.id}&gt;{genre.name}&lt;/p&gt;;
                   })}
                 &lt;/div&gt;
                 &lt;p&gt;{movie.tagline}&lt;/p&gt;
-                &lt;p className=&#34;mt-2 mr-10&#34;&gt;{movie.overview}&lt;/p&gt;
-                &lt;div className=&#34;flex items-center gap-3&#34;&gt;
+                &lt;p className=&#34;movie-overview&#34;&gt;{movie.overview}&lt;/p&gt;
+                &lt;div className=&#34;movie-note&#34;&gt;
                   &lt;Note note={movie.vote_average} /&gt;
                   &lt;Like id={movie.id} /&gt;
                 &lt;/div&gt;
@@ -427,7 +427,7 @@ const SSRPage = ({
 &lt;Image
   src={posterUrl}
   alt={movie.title}
-  className=&#34;rounded-t-lg aspect-[2/3] object-cover&#34;
+  className=&#34;movie-poster&#34;
   height={750}
   width={500}
   sizes=&#34;(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw&#34;
@@ -598,37 +598,37 @@ const SSRMovieDetailsPage = ({
       &lt;Head&gt;
         &lt;title&gt;Server Side Rendering&lt;/title&gt;
       &lt;/Head&gt;
-      &lt;div className=&#34;flex md:flex-row flex-col&#34;&gt;
-        &lt;div className=&#34;poster z-10 md:order-first order-last&#34;&gt;
+      &lt;div className=&#34;details-page&#34;&gt;
+        &lt;div className=&#34;poster&#34;&gt;
           &lt;Image
             src={posterUrl}
             alt={movie.title}
-            className=&#34;aspect-[2/3] object-cover h-full&#34;
+            className=&#34;poster-image&#34;
             height={750}
             width={500}
             sizes=&#34;(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw&#34;
             priority
           /&gt;
         &lt;/div&gt;
-        &lt;div className=&#34;description relative w-full&#34;&gt;
+        &lt;div className=&#34;relative-full&#34;&gt;
           &lt;Image
-            className=&#34;block z-0 object-cover brightness-50&#34;
+            className=&#34;movie-backdrop&#34;
             alt={movie.title}
             src={backdropPathUrl}
             fill
             priority
           /&gt;
-          &lt;div className=&#34;relative flex flex-col&#34;&gt;
-            &lt;div className=&#34;flex flex-col gap-3 ml-4 text-white mt-3&#34;&gt;
-              &lt;h1 className=&#34;text-xl font-semibold&#34;&gt;{movie.title}&lt;/h1&gt;
-              &lt;div className=&#34;flex gap-2&#34;&gt;
+          &lt;div className=&#34;movie-description&#34;&gt;
+            &lt;div className=&#34;informations&#34;&gt;
+              &lt;h1 className=&#34;movie-title&#34;&gt;{movie.title}&lt;/h1&gt;
+              &lt;div className=&#34;movie-genre&#34;&gt;
                 {movie.genres.map((genre) =&gt; {
                   return &lt;p key={genre.id}&gt;{genre.name}&lt;/p&gt;;
                 })}
               &lt;/div&gt;
               &lt;p&gt;{movie.tagline}&lt;/p&gt;
-              &lt;p className=&#34;mt-2 mr-10&#34;&gt;{movie.overview}&lt;/p&gt;
-              &lt;div className=&#34;flex items-center gap-3&#34;&gt;
+              &lt;p className=&#34;movie-overview&#34;&gt;{movie.overview}&lt;/p&gt;
+              &lt;div className=&#34;movie-note&#34;&gt;
                 &lt;Note note={movie.vote_average} /&gt;
               &lt;/div&gt;
             &lt;/div&gt;
@@ -762,37 +762,37 @@ const SSGMovieDetailsPage = ({
       &lt;Head&gt;
         &lt;title&gt;Static Site Generation&lt;/title&gt;
       &lt;/Head&gt;
-      &lt;div className=&#34;flex md:flex-row flex-col&#34;&gt;
-        &lt;div className=&#34;poster z-10 md:order-first order-last&#34;&gt;
+      &lt;div className=&#34;details-page&#34;&gt;
+        &lt;div className=&#34;poster&#34;&gt;
           &lt;Image
             src={posterUrl}
             alt={movie.title}
-            className=&#34;aspect-[2/3] object-cover h-full&#34;
+            className=&#34;poster-image&#34;
             height={750}
             width={500}
             sizes=&#34;(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw&#34;
             priority
           /&gt;
         &lt;/div&gt;
-        &lt;div className=&#34;description relative w-full&#34;&gt;
+        &lt;div className=&#34;relative-full&#34;&gt;
           &lt;Image
-            className=&#34;block z-0 object-cover brightness-50&#34;
+            className=&#34;movie-backdrop&#34;
             alt={movie.title}
             src={backdropPathUrl}
             fill
             priority
           /&gt;
-          &lt;div className=&#34;relative flex flex-col&#34;&gt;
-            &lt;div className=&#34;flex flex-col gap-3 ml-4 text-white mt-3&#34;&gt;
-              &lt;h1 className=&#34;text-xl font-semibold&#34;&gt;{movie.title}&lt;/h1&gt;
-              &lt;div className=&#34;flex gap-2&#34;&gt;
+          &lt;div className=&#34;movie-description&#34;&gt;
+            &lt;div className=&#34;informations&#34;&gt;
+              &lt;h1 className=&#34;movie-title&#34;&gt;{movie.title}&lt;/h1&gt;
+              &lt;div className=&#34;movie-genre&#34;&gt;
                 {movie.genres.map((genre) =&gt; {
                   return &lt;p key={genre.id}&gt;{genre.name}&lt;/p&gt;;
                 })}
               &lt;/div&gt;
               &lt;p&gt;{movie.tagline}&lt;/p&gt;
-              &lt;p className=&#34;mt-2 mr-10&#34;&gt;{movie.overview}&lt;/p&gt;
-              &lt;div className=&#34;flex items-center gap-3&#34;&gt;
+              &lt;p className=&#34;movie-overview&#34;&gt;{movie.overview}&lt;/p&gt;
+              &lt;div className=&#34;movie-note&#34;&gt;
                 &lt;Note note={movie.vote_average} /&gt;
               &lt;/div&gt;
             &lt;/div&gt;
@@ -911,37 +911,37 @@ const RSCMovieDetailsPage = async ({ params }: { params: { id: number } }) =&gt;
   const backdropPathUrl = `https://image.tmdb.org/t/p/original/${movie.backdrop_path}`;
 
   return (
-    &lt;main className=&#34;flex md:flex-row flex-col&#34;&gt;
-      &lt;div className=&#34;poster z-10 md:order-first order-last&#34;&gt;
+    &lt;main className=&#34;details-page&#34;&gt;
+      &lt;div className=&#34;poster&#34;&gt;
         &lt;Image
           src={posterUrl}
           alt={movie.title}
-          className=&#34;aspect-[2/3] object-cover h-full&#34;
+          className=&#34;poster-image&#34;
           height={750}
           width={500}
           sizes=&#34;(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw&#34;
           priority
         /&gt;
       &lt;/div&gt;
-      &lt;div className=&#34;description relative w-full&#34;&gt;
+      &lt;div className=&#34;relative-full&#34;&gt;
         &lt;Image
-          className=&#34;block z-0 object-cover brightness-50&#34;
+          className=&#34;movie-backdrop&#34;
           alt={movie.title}
           src={backdropPathUrl}
           fill
           priority
         /&gt;
-        &lt;div className=&#34;relative flex flex-col&#34;&gt;
-          &lt;div className=&#34;flex flex-col gap-3 ml-4 text-white mt-3&#34;&gt;
-            &lt;h1 className=&#34;text-xl font-semibold&#34;&gt;{movie.title}&lt;/h1&gt;
-            &lt;div className=&#34;flex gap-2&#34;&gt;
+        &lt;div className=&#34;movie-description&#34;&gt;
+          &lt;div className=&#34;informations&#34;&gt;
+            &lt;h1 className=&#34;movie-title&#34;&gt;{movie.title}&lt;/h1&gt;
+            &lt;div className=&#34;movie-genre&#34;&gt;
               {movie.genres.map((genre) =&gt; {
                 return &lt;p key={genre.id}&gt;{genre.name}&lt;/p&gt;;
               })}
             &lt;/div&gt;
             &lt;p&gt;{movie.tagline}&lt;/p&gt;
-            &lt;p className=&#34;mt-2 mr-10&#34;&gt;{movie.overview}&lt;/p&gt;
-            &lt;div className=&#34;flex items-center gap-3&#34;&gt;
+            &lt;p className=&#34;movie-overview&#34;&gt;{movie.overview}&lt;/p&gt;
+            &lt;div className=&#34;movie-note&#34;&gt;
               &lt;Note note={movie.vote_average} /&gt;
             &lt;/div&gt;
           &lt;/div&gt;
@@ -1025,17 +1025,17 @@ import { fetchMovieDetails } from &#39;@/services/movie.service&#39;;
 import Image from &#39;next/image&#39;;
 
 // ...
-&lt;div className=&#34;relative flex flex-col&#34;&gt;
-  &lt;div className=&#34;flex flex-col gap-3 ml-4 text-white mt-3&#34;&gt;
-    &lt;h1 className=&#34;text-xl font-semibold&#34;&gt;{movie.title}&lt;/h1&gt;
-    &lt;div className=&#34;flex gap-2&#34;&gt;
+&lt;div className=&#34;movie-description&#34;&gt;
+  &lt;div className=&#34;informations&#34;&gt;
+    &lt;h1 className=&#34;movie-title&#34;&gt;{movie.title}&lt;/h1&gt;
+    &lt;div className=&#34;movie-genre&#34;&gt;
       {movie.genres.map((genre) =&gt; {
         return &lt;p key={genre.id}&gt;{genre.name}&lt;/p&gt;;
       })}
     &lt;/div&gt;
     &lt;p&gt;{movie.tagline}&lt;/p&gt;
-    &lt;p className=&#34;mt-2 mr-10&#34;&gt;{movie.overview}&lt;/p&gt;
-    &lt;div className=&#34;flex items-center gap-3&#34;&gt;
+    &lt;p className=&#34;movie-overview&#34;&gt;{movie.overview}&lt;/p&gt;
+    &lt;div className=&#34;movie-note&#34;&gt;
       &lt;Note note={movie.vote_average} /&gt;
       &lt;Like id={movie.id} /&gt;
     &lt;/div&gt;
@@ -1109,10 +1109,8 @@ const RSCMovieDetailsPage = async ({ params }: { params: { id: number } }) =&gt;
 
   return (
     // ...
-    &lt;div className=&#34;relative flex flex-col&#34;&gt;
-      &lt;div className=&#34;flex flex-col gap-3 ml-4 text-white mt-3&#34;&gt;
-        {/*  ...  */}
-      &lt;/div&gt;
+    &lt;div className=&#34;movie-description&#34;&gt;
+      &lt;div className=&#34;informations&#34;&gt;{/*  ...  */}&lt;/div&gt;
       &lt;div className=&#34;reviews-list&#34;&gt;
         {reviews.map((review: Review) =&gt; (
           &lt;MovieReview key={review.id} review={review} /&gt;
