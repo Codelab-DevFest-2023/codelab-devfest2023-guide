@@ -73,9 +73,14 @@ VITE_API_KEY=eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIyZmMxMDQ0YjI0ZDdkYjcyY2RlZmJmNTBkNT
 <pre><code>eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIyZmMxMDQ0YjI0ZDdkYjcyY2RlZmJmNTBkNTkyNzhiYyIsInN1YiI6IjY0YzU2ZTgyNjNhNjk1MDEwMzk5Y2I0YiIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.Rc42SZEbnqH6PvJRj1GAVYTADLcR5vNzArE1P333_dI
 </code></pre>
 <p>Clé 2 :</p>
-<pre><code>eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIyZmMxMDQ0YjI0ZDdkYjcyY2RlZmJmNTBkNTkyNzhiYyIsInN1YiI6IjY0YzU2ZTgyNjNhNjk1MDEwMzk5Y2I0YiIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.Rc42SZEbnqH6PvJRj1GAVYTADLcR5vNzArE1P333_dI
+<pre><code>eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIxNTk0NTM5OGIxMzZhODZhZDU4ZjE3MmFlYTQ3ZTNjZCIsInN1YiI6IjVlNzkxY2Y0MzU3YzAwMDAxMTU0MDAwZSIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.8XGXQO22Mv8UaooWf0sDnUWRpNTdlzuO5rZClx-eEDc
 </code></pre>
-<p>TODO Ajouter d&#39;autres clés</p>
+<p>Clé 3 :</p>
+<pre><code>eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJmNTA3Yzc1MTA3MWQyZjkzZTRiMTU2Mzg4NzY3NjEwMSIsInN1YiI6IjY1MjNmYzBjNzQ1MDdkMDBlMjEzYjMxNiIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.7Ge2En8f5fq1Iq1MyzIKPUL1ITqaDECKYhsi8UqSucQ
+</code></pre>
+<p>Clé 4 :</p>
+<pre><code>eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIyYjIxMDJiZjVhNDJlNmI4YmE5MTc0ZDFmY2ZjMzE1NCIsInN1YiI6IjY1MjNmZmRhMGNiMzM1MTZmNWM1ZWJmYSIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.e_DyQRJhs1aK8FPXbM-dgn025D-Xp2M9fXQ1GdEYGjw
+</code></pre>
 <h2 is-upgraded>Liste des 20 films les plus populaires</h2>
 <p>Pour commencer, nous allons créer une page affichant la liste des 20 films les plus populaires du moment. Nous avons donc besoin de créer :</p>
 <ul>
@@ -895,7 +900,7 @@ export default RSCPage;
 <aside class="special"><p>Le code <strong>export const revalidate = 0;</strong> est un mécanisme qui permet de mettre en cache les données générées côté serveur (SSR) pendant une période spécifiée. En mettant revalidate à zéro (0), cela signifie que les données seront générées à chaque demande sans mise en cache ni expiration. </p>
 </aside>
 <p>Nous pouvons redémarrer l&#39;application avec la commande <code>npm run dev</code> et constater que la liste des films s&#39;affiche correctement à l&#39;adresse <code>http://localhost:3000/rsc</code>.</p>
-<aside class="warning"><p> Lors du lancement de l&#39;application, vous devriez avoir une error Nextjs. Dans Next.js version &gt; 13, <strong>&#34;use client&#34;</strong> est toujours nécessaire lorsque le composant est rendu sur le client </p>
+<aside class="warning"><p> Lors du lancement de l&#39;application, vous devriez avoir une error Nextjs. Avec la version 13, <strong>&#34;use client&#34;</strong> est toujours nécessaire lorsque le composant est rendu sur le client </p>
 </aside>
 <p>Il est impératif de spécifier ‘use client&#39; dans le fichier <code>/src/components/search/SearchBox.tsx</code>.</p>
 <pre><code language="language-tsx" class="language-tsx">&#39;use client&#39;;
