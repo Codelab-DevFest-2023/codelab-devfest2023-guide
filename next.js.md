@@ -51,11 +51,11 @@ Pour cette partie nous travaillerons dans le répertoire `codelab-devfest2023-cs
 
 ### Création des variables d'environnement
 
-Pour pouvoir utiliser l'API TMDB nous devons fournir une clé d'API dans un fichier `.env`. Créons un fichier `.env` à la racine du projet avec le contenu suivant :
+Pour pouvoir utiliser l'API TMDB nous devons fournir une clé d'API. Créons un fichier `.env` à la racine du projet avec le contenu suivant :
 
 ```
 VITE_API_URL=https://api.themoviedb.org/3
-VITE_API_KEY=eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIyZmMxMDQ0YjI0ZDdkYjcyY2RlZmJmNTBkNTkyNzhiYyIsInN1YiI6IjY0YzU2ZTgyNjNhNjk1MDEwMzk5Y2I0YiIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.Rc42SZEbnqH6PvJRj1GAVYTADLcR5vNzArE1P333_dI
+VITE_API_KEY=xxx
 ```
 
 Utilisons une clé d'API parmi celles-ci :
@@ -1104,7 +1104,7 @@ Dans le répertoire `/src/components/like` du projet, ouvrons le fichier `Like.t
 ```tsx
 'use client';
 import { useEffect, useState } from 'react';
-import './like.module.css';
+import './like.css';
 
 interface Props {
   id: number;

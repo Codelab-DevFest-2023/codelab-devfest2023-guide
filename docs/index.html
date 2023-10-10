@@ -64,9 +64,9 @@ npm install
 <aside class="special"><p>Pour se concentrer sur ce qui est spécifique au client side rendering, certains éléments sont déjà fournis dans le repository : carte d&#39;un film, méthodes de fetch des données, composant de layout, etc...</p>
 </aside>
 <h2 is-upgraded>Création des variables d&#39;environnement</h2>
-<p>Pour pouvoir utiliser l&#39;API TMDB nous devons fournir une clé d&#39;API dans un fichier <code>.env</code>. Créons un fichier <code>.env</code> à la racine du projet avec le contenu suivant :</p>
+<p>Pour pouvoir utiliser l&#39;API TMDB nous devons fournir une clé d&#39;API. Créons un fichier <code>.env</code> à la racine du projet avec le contenu suivant :</p>
 <pre><code>VITE_API_URL=https://api.themoviedb.org/3
-VITE_API_KEY=eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIyZmMxMDQ0YjI0ZDdkYjcyY2RlZmJmNTBkNTkyNzhiYyIsInN1YiI6IjY0YzU2ZTgyNjNhNjk1MDEwMzk5Y2I0YiIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.Rc42SZEbnqH6PvJRj1GAVYTADLcR5vNzArE1P333_dI
+VITE_API_KEY=xxx
 </code></pre>
 <p>Utilisons une clé d&#39;API parmi celles-ci :</p>
 <p>Clé 1 :</p>
@@ -972,7 +972,7 @@ export default RSCMovieDetailsPage;
 <p>Dans le répertoire <code>/src/components/like</code> du projet, ouvrons le fichier <code>Like.tsx</code>.</p>
 <pre><code language="language-tsx" class="language-tsx">&#39;use client&#39;;
 import { useEffect, useState } from &#39;react&#39;;
-import &#39;./like.module.css&#39;;
+import &#39;./like.css&#39;;
 
 interface Props {
   id: number;
