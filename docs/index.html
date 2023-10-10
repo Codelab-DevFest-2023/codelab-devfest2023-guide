@@ -461,14 +461,12 @@ const SearchBox = () =&gt; {
     const value = event.target.value;
     setSearchValue(value);
 
-    const queryParams = new URLSearchParams();
-    queryParams.append(&#39;query&#39;, encodeURI(value));
-
     if (value.length &gt; 3) {
-      router.push(`${currentPathname}?${queryParams.toString()}`);
+      const newUrl = currentPathname + &#39;?searchKey=&#39; + encodeURI(value);
+      router.push(newUrl);
     }
 
-    if (value.length &lt;= 2 &amp;&amp; searchParams?.get(&#39;query&#39;)) {
+    if (value.length &lt;= 2 &amp;&amp; searchParams?.get(&#39;searchKey&#39;)) {
       router.push(currentPathname);
     }
   };
@@ -504,11 +502,11 @@ import Link from &#39;next/link&#39;;
 
 export const getServerSideProps: GetServerSideProps&lt;{
   movies: Movie[];
-}&gt; = async ({ query: searchParams }) =&gt; {
+}&gt; = async ({ query }) =&gt; {
   let movies: Movie[];
 
-  if (searchParams.query) {
-    const { results } = await searchMovies(searchParams.query as string);
+  if (query.searchKey) {
+    const { results } = await searchMovies(query.searchKey as string);
     movies = results;
   } else {
     const { results } = await fetchPopularMovies();
@@ -868,8 +866,8 @@ interface Props {
 const RSCPage = async ({ searchParams }: Props) =&gt; {
   let movies: Movie[];
 
-  if (searchParams.query) {
-    const { results } = await searchMovies(searchParams.query as string);
+  if (searchParams.searchKey) {
+    const { results } = await searchMovies(searchParams.searchKey as string);
     movies = results;
   } else {
     const { results } = await fetchPopularMovies();
