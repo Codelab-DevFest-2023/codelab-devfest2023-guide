@@ -76,4 +76,4 @@ Pour que les fichiers du codelab puissent être déployés sur Github.io, il fau
 cp -R next.js/* ./docs
 ```
 
-Le compte Github doit être configuré pour faire pointer Github Pages sur le répertoire `/docs` du repository. Le codelab est alors accessible sur l'adresse : `https://chawax.github.io/nestjs-codelab`
+Le compte Github doit être configuré pour faire pointer Github Pages sur le répertoire `/docs` du repository. Le codelab est alors accessible sur l'adresse : `https://codelab-devfest-2023.github.io/codelab-devfest2023-guide`
