@@ -4,7 +4,7 @@ id:docs
 
 ## Initialisation du codelab
 
-Duration: 5:00
+Duration: 10:00
 
 Prérequis :
 
@@ -41,7 +41,7 @@ Lançons la commande `npm run dev` et vérifons qu'on a bien une application qui
 
 ## Client Side Rendering
 
-Duration: 20:00
+Duration: 25:00
 
 Dans cette première partie, nous allons développer une application en Client Side Rendering (CSR) s'appuyant sur Vite.js, React et Tailwind. Nous n'utiliserons donc pas Next.js dans cet exercice. Mais en créant une application en CSR, nous verrons mieux les différences avec les autres modes de rendu que nous verrons plus tard.
 
@@ -380,7 +380,7 @@ Enfin affichons le code source de la page pour constater que cette page n'est pa
 
 ## Server Side Rendering
 
-Duration: 35:00
+Duration: 25:00
 
 Dans cette deuxième partie, nous allons développer une application en Server Side Rendering s'appuyant sur Next.js et Tailwind.
 
@@ -746,7 +746,7 @@ Ouvrons l'application sur `http://localhost:3000` puis accédons à la rubrique 
 
 ## Static Site Generation
 
-Duration: 10:00
+Duration: 15:00
 
 <aside>Si vous n'avez pas eu le temps de finir l'étape précédente, vous pouvez faire un checkout de la branche "ssr-end" pour débuter cette étape : <code>git checkout -f ssr-end</code></aside>
 
