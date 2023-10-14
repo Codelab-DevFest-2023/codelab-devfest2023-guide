@@ -20,8 +20,9 @@
   </style>
 </head>
 <body>
-  <google-codelab-analytics gaid="UA-49880327-14"></google-codelab-analytics>
+  <google-codelab-analytics gaid="UA-49880327-14" ga4id=""></google-codelab-analytics>
   <google-codelab codelab-gaid=""
+                  codelab-ga4id=""
                   id="docs"
                   title="Rendu front, action ! Découvrez les différents modes de rendu avec Next.js"
                   environment="web"
@@ -969,60 +970,64 @@ export default RSCMovieDetailsPage;
 <p>Dans le répertoire <code>/src/components/like</code> du projet, ouvrons le fichier <code>Like.tsx</code>.</p>
 <pre><code language="language-tsx" class="language-tsx">&#39;use client&#39;;
 import { useEffect, useState } from &#39;react&#39;;
-import &#39;./like.css&#39;;
+import HeartIcon from &#39;./HeartIcon&#39;;
 
 interface Props {
   id: number;
 }
 
+interface Favorite {
+  id: number;
+}
+
 const Like = ({ id }: Props) =&gt; {
-  const [filled, setFilled] = useState(false);
+  const [isFavorite, setIsFavorite] = useState&lt;boolean&gt;(false);
 
   useEffect(() =&gt; {
     const favorites = localStorage.getItem(&#39;favorites&#39;);
     if (favorites) {
-      const isFind = JSON.parse(favorites).find(
-        (element: { id: number }) =&gt; element.id === id
+      const isFound = JSON.parse(favorites).find(
+        (favorite: Favorite) =&gt; favorite.id === id
       );
-      if (isFind) {
-        setFilled(true);
+      if (isFound) {
+        setIsFavorite(true);
       }
     } else {
-      setFilled(false);
+      setIsFavorite(false);
     }
   }, [id]);
 
   const handleClick = () =&gt; {
-    const favorites = localStorage.getItem(&#39;favorites&#39;);
-    if (favorites) {
-      const favoritesList = JSON.parse(favorites);
-
-      const filterFav = favoritesList.filter(
-        (fav: { id: number }) =&gt; fav.id !== id
+    const storedFavorites = localStorage.getItem(&#39;favorites&#39;);
+    if (storedFavorites) {
+      const favoritesList: Favorite[] = JSON.parse(storedFavorites);
+      const hasFavorite = favoritesList.some(
+        (favorite: Favorite) =&gt; favorite.id === id
       );
 
-      if (filterFav.length === favoritesList.length) {
-        setFilled(true);
-        favoritesList.push({ id: id });
+      if (!hasFavorite) {
+        favoritesList.push({ id });
         localStorage.setItem(&#39;favorites&#39;, JSON.stringify(favoritesList));
+        setIsFavorite(true);
       } else {
-        setFilled(false);
-        localStorage.setItem(&#39;favorites&#39;, JSON.stringify(filterFav));
+        const updatedFavoritesList = favoritesList.filter(
+          (favorite: Favorite) =&gt; favorite.id !== id
+        );
+        localStorage.setItem(&#39;favorites&#39;, JSON.stringify(updatedFavoritesList));
+        setIsFavorite(false);
       }
     } else {
-      setFilled(true);
       localStorage.setItem(&#39;favorites&#39;, JSON.stringify([{ id: id }]));
+      setIsFavorite(true);
     }
   };
 
   return (
     &lt;button
-      className={`heart-button ${filled ? &#39;filled&#39; : &#39;&#39;}`}
+      className={`heart-button ${isFavorite ? &#39;filled&#39; : &#39;&#39;}`}
       onClick={handleClick}
     &gt;
-      &lt;svg className=&#34;heart-icon&#34; viewBox=&#34;0 0 26 26&#34;&gt;
-        &lt;path d=&#34;M12 21.35l-1.45-1.32C5.4 16.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C15.09 3.81 16.76 3 18.5 3 21.58 3 24 5.42 24 8.5c0 3.78-3.4 7.86-8.55 11.54L12 21.35z&#34; /&gt;
-      &lt;/svg&gt;
+      &lt;HeartIcon /&gt;
     &lt;/button&gt;
   );
 };
