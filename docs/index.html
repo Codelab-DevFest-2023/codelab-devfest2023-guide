@@ -20,9 +20,8 @@
   </style>
 </head>
 <body>
-  <google-codelab-analytics gaid="UA-49880327-14" ga4id=""></google-codelab-analytics>
+  <google-codelab-analytics gaid="UA-49880327-14"></google-codelab-analytics>
   <google-codelab codelab-gaid=""
-                  codelab-ga4id=""
                   id="docs"
                   title="Rendu front, action ! Découvrez les différents modes de rendu avec Next.js"
                   environment="web"
@@ -439,11 +438,11 @@ const SSRPage = ({
 // ...
 </code></pre>
 <h2 is-upgraded>Recherche de films</h2>
-<p>Nous allons créer un composant qui affiche un champ de recherche de films. Le terme recherché sera ajouté en tant que paramètre <code>query</code> dans l&#39;url de la page : <code>http://localhost:3000/ssr?query=xxxx</code>.</p>
+<p>Nous allons créer un composant qui affiche un champ de recherche de films. Le terme recherché sera ajouté en tant que paramètre <code>searchKey</code> dans l&#39;url de la page : <code>http://localhost:3000/ssr?searchKey=xxxx</code>.</p>
 <p>Un squelette du composant <code>SearchBox</code> est déjà fourni dans le fichier <code>/src/components/search/SearchBox.tsx</code>. Nous allons compléter ce composant pour :</p>
 <ul>
 <li>Gérer la valeur saisie dans le champ de recherche</li>
-<li>Utiliser les hooks de navigation de Next.js pour rafraîchir la page en passant dans le paramètre <code>query</code> de l&#39;url le terme recherché.</li>
+<li>Utiliser les hooks de navigation de Next.js pour rafraîchir la page en passant dans le paramètre <code>searchKey</code> de l&#39;url le terme recherché.</li>
 </ul>
 <p>Tout le code ajouté est basé sur des hooks et des méthodes événementielles, il ne s&#39;exécutera donc que dans le browser, côté client.</p>
 <p>Voici le code du composant terminé :</p>
@@ -484,12 +483,12 @@ const SearchBox = () =&gt; {
 
 export default SearchBox;
 </code></pre>
-<p>Ce paramètre <code>query</code> doit être récupéré côté serveur pour appeler la bonne route d&#39;API TMDB :</p>
+<p>Ce paramètre <code>searchKey</code> doit être récupéré côté serveur pour appeler la bonne route d&#39;API TMDB :</p>
 <ul>
-<li>La route <code>search/movie</code> en cas de présence du paramètre <code>query</code></li>
-<li>La route <code>movie/popular</code> en cas d&#39;absence du paramètre <code>query</code></li>
+<li>La route <code>search/movie</code> en cas de présence du paramètre <code>searchKey</code></li>
+<li>La route <code>movie/popular</code> en cas d&#39;absence du paramètre <code>searchKey</code></li>
 </ul>
-<p>Modifions donc la méthode <code>getServerSideProps</code> de la page <code>/src/pages/ssr/index.tsx</code> afin de récupérer le paramètre <code>query</code> et le passer à la méthode <code>searchMovies</code> :</p>
+<p>Modifions donc la méthode <code>getServerSideProps</code> de la page <code>/src/pages/ssr/index.tsx</code> afin de récupérer le paramètre <code>searchKey</code> et le passer à la méthode <code>searchMovies</code> :</p>
 <pre><code language="language-tsx" class="language-tsx">import MovieCard from &#39;@/components/movie/card/MovieCard&#39;;
 import SearchBox from &#39;@/components/search/SearchBox&#39;;
 import { Movie } from &#39;@/interfaces/movie.interface&#39;;

@@ -495,12 +495,12 @@ import Image from 'next/image';
 
 ### Recherche de films
 
-Nous allons créer un composant qui affiche un champ de recherche de films. Le terme recherché sera ajouté en tant que paramètre `query` dans l'url de la page : `http://localhost:3000/ssr?query=xxxx`.
+Nous allons créer un composant qui affiche un champ de recherche de films. Le terme recherché sera ajouté en tant que paramètre `searchKey` dans l'url de la page : `http://localhost:3000/ssr?searchKey=xxxx`.
 
 Un squelette du composant `SearchBox` est déjà fourni dans le fichier `/src/components/search/SearchBox.tsx`. Nous allons compléter ce composant pour :
 
 - Gérer la valeur saisie dans le champ de recherche
-- Utiliser les hooks de navigation de Next.js pour rafraîchir la page en passant dans le paramètre `query` de l'url le terme recherché.
+- Utiliser les hooks de navigation de Next.js pour rafraîchir la page en passant dans le paramètre `searchKey` de l'url le terme recherché.
 
 Tout le code ajouté est basé sur des hooks et des méthodes événementielles, il ne s'exécutera donc que dans le browser, côté client.
 
@@ -545,12 +545,12 @@ const SearchBox = () => {
 export default SearchBox;
 ```
 
-Ce paramètre `query` doit être récupéré côté serveur pour appeler la bonne route d'API TMDB :
+Ce paramètre `searchKey` doit être récupéré côté serveur pour appeler la bonne route d'API TMDB :
 
-- La route `search/movie` en cas de présence du paramètre `query`
-- La route `movie/popular` en cas d'absence du paramètre `query`
+- La route `search/movie` en cas de présence du paramètre `searchKey`
+- La route `movie/popular` en cas d'absence du paramètre `searchKey`
 
-Modifions donc la méthode `getServerSideProps` de la page `/src/pages/ssr/index.tsx` afin de récupérer le paramètre `query` et le passer à la méthode `searchMovies` :
+Modifions donc la méthode `getServerSideProps` de la page `/src/pages/ssr/index.tsx` afin de récupérer le paramètre `searchKey` et le passer à la méthode `searchMovies` :
 
 ```tsx
 import MovieCard from '@/components/movie/card/MovieCard';
