@@ -752,7 +752,7 @@ Duration: 15:00
 
 Dans cette troisième partie, nous allons développer la même application que précédement mais en Static Site Generation en s'appuyant sur Next.js et Tailwind.
 
-<aside class="negative">Cet exercice utilisera le routage <strong>pages</strong> (Next.js < 13).</aside>
+<aside class="negative">Cet exercice utilisera le système de routage <strong>pages</strong> de Next.js.</aside>
 
 ### Liste des films
 
@@ -952,7 +952,7 @@ Duration: 25:00
 
 Dans cette quatrième et dernière partie, nous allons développer la même application que précédement mais en utilisant les React Server Components, toujours en s'appuyant sur Next.js et Tailwind.
 
-<aside class="negative">Cet exercice utilisera le routage <strong>app</strong> (Next.js > 13).</aside>
+<aside class="negative">Cet exercice utilisera le système de routage <strong>app</strong> de Next.js (à partir de la version 13.4).</aside>
 
 ### Liste des films
 
