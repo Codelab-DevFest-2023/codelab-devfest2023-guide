@@ -84,6 +84,18 @@ Clé 4 :
 eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIyYjIxMDJiZjVhNDJlNmI4YmE5MTc0ZDFmY2ZjMzE1NCIsInN1YiI6IjY1MjNmZmRhMGNiMzM1MTZmNWM1ZWJmYSIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.e_DyQRJhs1aK8FPXbM-dgn025D-Xp2M9fXQ1GdEYGjw
 ```
 
+Clé 5 :
+
+```
+eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJhNWY2MzIxYzNkZjZlNTViMzg0MmFjNDg0YTM3Nzg3OSIsInN1YiI6IjY1MmU3NDEwYTgwMjM2MDEzNzY4MzQxZCIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.NrO2FbWVZcEqHhfEhc35vcgwUoZQh0CEOupwFRDoAKQ
+```
+
+Clé 6 :
+
+```
+eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI1NTVhYWM4MmUxZDIyMmMxYmQyYzA5Zjk5ZGUzMzQ1OSIsInN1YiI6IjY1MmVlODE3MzU4ZGE3NWI1YTJmNWZiMCIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.p9_mcUS7snnlm7ZjcEb8UgJFUTjltZkNGmJ8cHjWxD4
+```
+
 ### Liste des 20 films les plus populaires
 
 Pour commencer, nous allons créer une page affichant la liste des 20 films les plus populaires du moment. Nous avons donc besoin de créer :
@@ -95,14 +107,14 @@ Pour commencer, nous allons créer une page affichant la liste des 20 films les 
 Créons le fichier `/src/hooks/movies.ts` et ajoutons y le hook `useMovies`. Ce hook s'appuie sur la librairie React Query pour charger la liste des films et gérer du cache. Elle s'appuie sur un service de fetch qui appelle l'API TMDB.
 
 ```ts
-import { useQuery } from '@tanstack/react-query';
-import { AxiosError } from 'axios';
-import { Movie } from '../interfaces/movie.interface';
-import { fetchPopularMovies } from '../services/movie.service';
+import { useQuery } from "@tanstack/react-query";
+import { AxiosError } from "axios";
+import { Movie } from "../interfaces/movie.interface";
+import { fetchPopularMovies } from "../services/movie.service";
 
 const useMovies = () => {
   return useQuery<Movie[], AxiosError>({
-    queryKey: ['movies'],
+    queryKey: ["movies"],
     queryFn: () => fetchPopularMovies(),
   });
 };
@@ -121,8 +133,8 @@ Puis modifions le composant `MoviesListPage` dans le fichier `/src/pages/movies/
 Le composant doit ressembler à ça :
 
 ```ts
-import MovieCard from '../../components/movie/card/MovieCard';
-import { useMovies } from '../../hooks/movies';
+import MovieCard from "../../components/movie/card/MovieCard";
+import { useMovies } from "../../hooks/movies";
 
 const MoviesListPage = () => {
   const { data: movies, isFetching, isError, isFetched, refetch } = useMovies();
@@ -166,10 +178,10 @@ export default MoviesListPage;
 Enfin nous allons ajouter une route `/movies` dans le fichier `/src/App.tsx` et l'associer au composant `MoviesListPage` comme ci-dessous.
 
 ```ts
-import { BrowserRouter, Route, Routes } from 'react-router-dom';
-import Layout from './components/layout/Layout';
-import HomePage from './pages/home/HomePage';
-import MoviesListPage from './pages/movies/MoviesListPage';
+import { BrowserRouter, Route, Routes } from "react-router-dom";
+import Layout from "./components/layout/Layout";
+import HomePage from "./pages/home/HomePage";
+import MoviesListPage from "./pages/movies/MoviesListPage";
 
 const App = () => {
   return (
@@ -225,19 +237,19 @@ Ensuite nous allons créer une page affichant le détail de chaque film. Nous av
 Modifions le fichier `/src/hooks/movies.ts` pour ajouter un nouveau hook `useMovie` qui charge le détail d'un film (toujours en s'appuyant sur React Query) :
 
 ```ts
-import { useQuery } from '@tanstack/react-query';
-import { AxiosError } from 'axios';
-import { Movie } from '../interfaces/movie.interface';
+import { useQuery } from "@tanstack/react-query";
+import { AxiosError } from "axios";
+import { Movie } from "../interfaces/movie.interface";
 import {
   fetchMovieDetails,
   fetchPopularMovies,
-} from '../services/movie.service';
+} from "../services/movie.service";
 
 // ...
 
 const useMovie = (movieId: number) => {
   return useQuery<Movie, AxiosError>({
-    queryKey: ['movies', movieId],
+    queryKey: ["movies", movieId],
     queryFn: () => fetchMovieDetails(movieId),
   });
 };
@@ -252,9 +264,9 @@ Puis modifions le fichier `/src/pages/movies/MovieDetailsPage.tsx` :
 - Affichage des informations sur le film
 
 ```ts
-import { useParams } from 'react-router-dom';
-import { useMovie } from '../../hooks/movies';
-import Note from '../../components/note/Note';
+import { useParams } from "react-router-dom";
+import { useMovie } from "../../hooks/movies";
+import Note from "../../components/note/Note";
 
 const MovieDetailsPage = () => {
   const { movieId } = useParams();
@@ -328,11 +340,11 @@ export default MovieDetailsPage;
 Créons une nouvelle route `/movies/:id` dans le fichier `/src/App.tsx`.
 
 ```ts
-import { BrowserRouter, Route, Routes } from 'react-router-dom';
-import Layout from './components/layout/Layout';
-import HomePage from './pages/home/HomePage';
-import MovieDetailsPage from './pages/movies/MovieDetailsPage';
-import MoviesListPage from './pages/movies/MoviesListPage';
+import { BrowserRouter, Route, Routes } from "react-router-dom";
+import Layout from "./components/layout/Layout";
+import HomePage from "./pages/home/HomePage";
+import MovieDetailsPage from "./pages/movies/MovieDetailsPage";
+import MoviesListPage from "./pages/movies/MoviesListPage";
 
 const App = () => {
   return (
@@ -408,9 +420,9 @@ Dans le répertoire `/src/pages/ssr` du projet, modifions le fichier `index.tsx`
 Nous allons définir une méthode `getServerSideProps` qui s'exécute côté serveur lorsque la page est générée. Ici elle permet d'appeler l'API pour récupérer la liste des films et la passer en tant que props `movies` au composant `SSRPage`.
 
 ```tsx
-import { Movie } from '@/interfaces/movie.interface';
-import { fetchPopularMovies } from '@/services/movie.service';
-import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
+import { Movie } from "@/interfaces/movie.interface";
+import { fetchPopularMovies } from "@/services/movie.service";
+import { GetServerSideProps, InferGetServerSidePropsType } from "next";
 
 const SSRPage = ({
   movies,
@@ -431,11 +443,11 @@ export default SSRPage;
 Il ne reste plus qu'à finir de construire notre page, en parcourant la liste de films fournie par la props `movies` :
 
 ```tsx
-import MovieCard from '@/components/movie/card/MovieCard';
-import { Movie } from '@/interfaces/movie.interface';
-import { fetchPopularMovies } from '@/services/movie.service';
-import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
-import Head from 'next/head';
+import MovieCard from "@/components/movie/card/MovieCard";
+import { Movie } from "@/interfaces/movie.interface";
+import { fetchPopularMovies } from "@/services/movie.service";
+import { GetServerSideProps, InferGetServerSidePropsType } from "next";
+import Head from "next/head";
 
 const SSRPage = ({
   movies,
@@ -477,7 +489,7 @@ Dans le répertoire `/src/components/movie/card` du projet, ouvrons le composant
 Remplaçons le composant `img` par un composant `Image` :
 
 ```tsx
-import Image from 'next/image';
+import Image from "next/image";
 
 // ...
 
@@ -507,8 +519,8 @@ Tout le code ajouté est basé sur des hooks et des méthodes événementielles,
 Voici le code du composant terminé :
 
 ```tsx
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import { ChangeEvent, useState } from 'react';
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { ChangeEvent, useState } from "react";
 
 const SearchBox = () => {
   const router = useRouter();
@@ -517,16 +529,16 @@ const SearchBox = () => {
   const [searchValue, setSearchValue] = useState<string | undefined>();
 
   const handleSearchChange = (event: ChangeEvent<HTMLInputElement>) => {
-    const currentPathname = pathname ?? '/';
+    const currentPathname = pathname ?? "/";
     const value = event.target.value;
     setSearchValue(value);
 
     if (value.length > 3) {
-      const newUrl = currentPathname + '?searchKey=' + encodeURI(value);
+      const newUrl = currentPathname + "?searchKey=" + encodeURI(value);
       router.push(newUrl);
     }
 
-    if (value.length <= 2 && searchParams?.get('searchKey')) {
+    if (value.length <= 2 && searchParams?.get("searchKey")) {
       router.push(currentPathname);
     }
   };
@@ -553,13 +565,13 @@ Ce paramètre `searchKey` doit être récupéré côté serveur pour appeler la 
 Modifions donc la méthode `getServerSideProps` de la page `/src/pages/ssr/index.tsx` afin de récupérer le paramètre `searchKey` et le passer à la méthode `searchMovies` :
 
 ```tsx
-import MovieCard from '@/components/movie/card/MovieCard';
-import SearchBox from '@/components/search/SearchBox';
-import { Movie } from '@/interfaces/movie.interface';
-import { fetchPopularMovies, searchMovies } from '@/services/movie.service';
-import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
-import Head from 'next/head';
-import Link from 'next/link';
+import MovieCard from "@/components/movie/card/MovieCard";
+import SearchBox from "@/components/search/SearchBox";
+import { Movie } from "@/interfaces/movie.interface";
+import { fetchPopularMovies, searchMovies } from "@/services/movie.service";
+import { GetServerSideProps, InferGetServerSidePropsType } from "next";
+import Head from "next/head";
+import Link from "next/link";
 
 // ...
 
@@ -583,13 +595,13 @@ export const getServerSideProps: GetServerSideProps<{
 Il ne reste plus qu'a ajouter le composant `SearchBox` dans notre page `src/pages/ssr/index.tsx` :
 
 ```tsx
-import MovieCard from '@/components/movie/card/MovieCard';
-import SearchBox from '@/components/search/SearchBox';
-import { Movie } from '@/interfaces/movie.interface';
-import { fetchPopularMovies, searchMovies } from '@/services/movie.service';
-import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
-import Head from 'next/head';
-import Link from 'next/link';
+import MovieCard from "@/components/movie/card/MovieCard";
+import SearchBox from "@/components/search/SearchBox";
+import { Movie } from "@/interfaces/movie.interface";
+import { fetchPopularMovies, searchMovies } from "@/services/movie.service";
+import { GetServerSideProps, InferGetServerSidePropsType } from "next";
+import Head from "next/head";
+import Link from "next/link";
 
 // ...
 <>
@@ -624,9 +636,9 @@ Dans le répertoire `/src/pages/ssr` du projet, modifions le fichier `[id].tsx`
 Modifions la méthode `getServerSideProps` pour récupérer les données concernant le film passé en paramètre.
 
 ```tsx
-import { Movie } from '@/interfaces/movie.interface';
-import { fetchMovieDetails } from '@/services/movie.service';
-import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
+import { Movie } from "@/interfaces/movie.interface";
+import { fetchMovieDetails } from "@/services/movie.service";
+import { GetServerSideProps, InferGetServerSidePropsType } from "next";
 
 const SSRMovieDetailsPage = ({
   movie,
@@ -642,7 +654,7 @@ export const getServerSideProps: GetServerSideProps<{
     const movie = await fetchMovieDetails(id);
     return { props: { movie } };
   } else {
-    throw new Error('Missing id parameter');
+    throw new Error("Missing id parameter");
   }
 };
 
@@ -657,12 +669,12 @@ Il ne reste plus qu'à finir de construire notre page, en affichant :
 - La note du film
 
 ```tsx
-import Note from '@/components/note/Note';
-import { Movie } from '@/interfaces/movie.interface';
-import { fetchMovieDetails } from '@/services/movie.service';
-import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
-import Head from 'next/head';
-import Image from 'next/image';
+import Note from "@/components/note/Note";
+import { Movie } from "@/interfaces/movie.interface";
+import { fetchMovieDetails } from "@/services/movie.service";
+import { GetServerSideProps, InferGetServerSidePropsType } from "next";
+import Head from "next/head";
+import Image from "next/image";
 
 const SSRMovieDetailsPage = ({
   movie,
@@ -774,16 +786,16 @@ export const getStaticProps: GetStaticProps<{
 Le reste du fichier est très semblable à ce qui a été fait pour le server side rendering : on passe la liste des films dans la props `movies` du composant et on parcourt cette liste.
 
 ```tsx
-import MovieCard from '@/components/movie/card/MovieCard';
-import { Movie } from '@/interfaces/movie.interface';
-import { fetchPopularMovies } from '@/services/movie.service';
+import MovieCard from "@/components/movie/card/MovieCard";
+import { Movie } from "@/interfaces/movie.interface";
+import { fetchPopularMovies } from "@/services/movie.service";
 import {
   GetServerSideProps,
   GetStaticProps,
   InferGetServerSidePropsType,
-} from 'next';
-import Head from 'next/head';
-import Link from 'next/link';
+} from "next";
+import Head from "next/head";
+import Link from "next/link";
 
 const SSGPage = ({
   movies,
@@ -842,15 +854,15 @@ export const getStaticProps: GetStaticProps<{
 Le reste du fichier est quasiment identique au server side rendering :
 
 ```ts
-import Note from '@/components/note/Note';
-import { Movie } from '@/interfaces/movie.interface';
+import Note from "@/components/note/Note";
+import { Movie } from "@/interfaces/movie.interface";
 import {
   fetchMovieDetails,
   fetchPopularMovies,
-} from '@/services/movie.service';
-import { GetStaticProps, InferGetServerSidePropsType } from 'next';
-import Head from 'next/head';
-import Image from 'next/image';
+} from "@/services/movie.service";
+import { GetStaticProps, InferGetServerSidePropsType } from "next";
+import Head from "next/head";
+import Image from "next/image";
 
 const SSGMovieDetailsPage = ({
   movie,
@@ -922,7 +934,7 @@ import {
   GetStaticPaths,
   GetStaticProps,
   InferGetServerSidePropsType,
-} from 'next';
+} from "next";
 
 // ...
 
@@ -963,11 +975,11 @@ Dans le répertoire `/src/app/rsc` du projet, modifions le fichier `page.tsx`.
 Nous n'avons plus besoin d'utiliser une méthode spécifique pour récupérer les données. nous pouvons directement faire un appel API dans notre composant serveur :
 
 ```tsx
-import MovieCard from '@/components/movie/card/MovieCard';
-import SearchBox from '@/components/search/SearchBox';
-import { Movie } from '@/interfaces/movie.interface';
-import { fetchPopularMovies, searchMovies } from '@/services/movie.service';
-import Link from 'next/link';
+import MovieCard from "@/components/movie/card/MovieCard";
+import SearchBox from "@/components/search/SearchBox";
+import { Movie } from "@/interfaces/movie.interface";
+import { fetchPopularMovies, searchMovies } from "@/services/movie.service";
+import Link from "next/link";
 
 export const revalidate = 0;
 
@@ -1039,9 +1051,9 @@ Dans le répertoire `/src/app/rsc/[id]` du projet, modifions le fichier `page.ts
 Comme précédement, nous pouvons directement faire un appel API dans notre composant serveur :
 
 ```tsx
-import Note from '@/components/note/Note';
-import { fetchMovieDetails } from '@/services/movie.service';
-import Image from 'next/image';
+import Note from "@/components/note/Note";
+import { fetchMovieDetails } from "@/services/movie.service";
+import Image from "next/image";
 
 const RSCMovieDetailsPage = async ({ params }: { params: { id: number } }) => {
   const movie = await fetchMovieDetails(params.id);
@@ -1100,9 +1112,9 @@ Nous allons mettre en place la possibilité de gérer des films favoris à trave
 Dans le répertoire `/src/components/like` du projet, ouvrons le fichier `Like.tsx`.
 
 ```tsx
-'use client';
-import { useEffect, useState } from 'react';
-import HeartIcon from './HeartIcon';
+"use client";
+import { useEffect, useState } from "react";
+import HeartIcon from "./HeartIcon";
 
 interface Props {
   id: number;
@@ -1116,7 +1128,7 @@ const Like = ({ id }: Props) => {
   const [isFavorite, setIsFavorite] = useState<boolean>(false);
 
   useEffect(() => {
-    const favorites = localStorage.getItem('favorites');
+    const favorites = localStorage.getItem("favorites");
     if (favorites) {
       const isFound = JSON.parse(favorites).find(
         (favorite: Favorite) => favorite.id === id
@@ -1130,7 +1142,7 @@ const Like = ({ id }: Props) => {
   }, [id]);
 
   const handleClick = () => {
-    const storedFavorites = localStorage.getItem('favorites');
+    const storedFavorites = localStorage.getItem("favorites");
     if (storedFavorites) {
       const favoritesList: Favorite[] = JSON.parse(storedFavorites);
       const hasFavorite = favoritesList.some(
@@ -1139,24 +1151,24 @@ const Like = ({ id }: Props) => {
 
       if (!hasFavorite) {
         favoritesList.push({ id });
-        localStorage.setItem('favorites', JSON.stringify(favoritesList));
+        localStorage.setItem("favorites", JSON.stringify(favoritesList));
         setIsFavorite(true);
       } else {
         const updatedFavoritesList = favoritesList.filter(
           (favorite: Favorite) => favorite.id !== id
         );
-        localStorage.setItem('favorites', JSON.stringify(updatedFavoritesList));
+        localStorage.setItem("favorites", JSON.stringify(updatedFavoritesList));
         setIsFavorite(false);
       }
     } else {
-      localStorage.setItem('favorites', JSON.stringify([{ id: id }]));
+      localStorage.setItem("favorites", JSON.stringify([{ id: id }]));
       setIsFavorite(true);
     }
   };
 
   return (
     <button
-      className={`heart-button ${isFavorite ? 'filled' : ''}`}
+      className={`heart-button ${isFavorite ? "filled" : ""}`}
       onClick={handleClick}
     >
       <HeartIcon />
@@ -1170,10 +1182,10 @@ export default Like;
 Il ne reste plus qu'à rajouter ce nouveau composant dans la page RSC (`/src/app/rsc/[id]/page.tsx`) :
 
 ```tsx
-import Like from '@/components/like/Like';
-import Note from '@/components/note/Note';
-import { fetchMovieDetails } from '@/services/movie.service';
-import Image from 'next/image';
+import Like from "@/components/like/Like";
+import Note from "@/components/note/Note";
+import { fetchMovieDetails } from "@/services/movie.service";
+import Image from "next/image";
 
 // ...
 <div className="movie-description">
@@ -1213,7 +1225,7 @@ Commençons par la méthode `fetchMovieDetails` en ajoutant `next: { revalidate:
 ```tsx
 const fetchMovieDetails = async (movieId: number): Promise<Movie> => {
   const queryParams = new URLSearchParams();
-  queryParams.append('language', 'fr-FR');
+  queryParams.append("language", "fr-FR");
 
   const URL = `${
     process.env.NEXT_PUBLIC_API_URL
@@ -1224,7 +1236,7 @@ const fetchMovieDetails = async (movieId: number): Promise<Movie> => {
     next: { revalidate: 604800 }, // 7 days
   });
   if (!result.ok) {
-    throw new Error('Failed to fetch trending movies data');
+    throw new Error("Failed to fetch trending movies data");
   }
 
   return result.json();
@@ -1239,11 +1251,11 @@ const fetchMovieReviews = async (movieId: number): Promise<Review[]> => {
 
   const result = await fetch(`${URL}`, {
     headers: API_HEADER,
-    cache: 'no-store',
+    cache: "no-store",
   });
 
   if (!result.ok) {
-    throw new Error('Failed to get movie reviews');
+    throw new Error("Failed to get movie reviews");
   }
 
   const data: ReviewResponse = await result.json();
@@ -1278,12 +1290,12 @@ export default RSCMovieDetailsPage;
 Et enfin, en ajoutant le composant `MovieReview` :
 
 ```tsx
-import Like from '@/components/like/Like';
-import MovieReview from '@/components/movie/review/MovieReview';
-import Note from '@/components/note/Note';
-import { Review } from '@/interfaces/review.interface';
-import { fetchMovieDetails, fetchMovieReviews } from '@/services/movie.service';
-import Image from 'next/image';
+import Like from "@/components/like/Like";
+import MovieReview from "@/components/movie/review/MovieReview";
+import Note from "@/components/note/Note";
+import { Review } from "@/interfaces/review.interface";
+import { fetchMovieDetails, fetchMovieReviews } from "@/services/movie.service";
+import Image from "next/image";
 
 const RSCMovieDetailsPage = async ({ params }: { params: { id: number } }) => {
   // ...
@@ -1312,4 +1324,3 @@ Ouvrons les devtools de Chrome (ou équivalent) pour observer :
 - Les chargements de fichiers Javascript
 - Les appels de service REST
 - La gestion du cache dans les logs
-
