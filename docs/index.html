@@ -391,7 +391,9 @@ export const getServerSideProps: GetServerSideProps&lt;{
 
 export default SSRPage;
 </code></pre>
-<p>Il ne reste plus qu&#39;à finir de construire notre page, en parcourant la liste de films fournie par la props <code>movies</code> :</p>
+<p>Il ne reste plus qu&#39;à finir de construire notre page, en parcourant la liste de films fournie par la props <code>movies</code>.</p>
+<aside class="warning"><p>Attention à bien importer le composant &#34;Head&#34; depuis &#34;next/head&#34; (l&#39;auto-complétion a tendance à proposer &#34;next/document&#34;) !</p>
+</aside>
 <pre><code language="language-tsx" class="language-tsx">import MovieCard from &#34;@/components/movie/card/MovieCard&#34;;
 import { Movie } from &#34;@/interfaces/movie.interface&#34;;
 import { fetchPopularMovies } from &#34;@/services/movie.service&#34;;
@@ -453,7 +455,9 @@ const SSRPage = ({
 <li>Utiliser les hooks de navigation de Next.js pour rafraîchir la page en passant dans le paramètre <code>searchKey</code> de l&#39;url le terme recherché.</li>
 </ul>
 <p>Tout le code ajouté est basé sur des hooks et des méthodes événementielles, il ne s&#39;exécutera donc que dans le browser, côté client.</p>
-<p>Voici le code du composant terminé :</p>
+<p>Voici le code du composant terminé.</p>
+<aside class="warning"><p>Attention à bien importer les hooks depuis &#34;next/navigation&#34; (l&#39;auto-complétion a tendance à proposer &#34;next/router&#34;) !</p>
+</aside>
 <pre><code language="language-tsx" class="language-tsx">import { usePathname, useRouter, useSearchParams } from &#34;next/navigation&#34;;
 import { ChangeEvent, useState } from &#34;react&#34;;
 

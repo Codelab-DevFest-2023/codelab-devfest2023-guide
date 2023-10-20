@@ -442,7 +442,9 @@ export const getServerSideProps: GetServerSideProps<{
 export default SSRPage;
 ```
 
-Il ne reste plus qu'à finir de construire notre page, en parcourant la liste de films fournie par la props `movies` :
+Il ne reste plus qu'à finir de construire notre page, en parcourant la liste de films fournie par la props `movies`.
+
+<aside class="negative">Attention à bien importer le composant "Head" depuis "next/head" (l'auto-complétion a tendance à proposer "next/document") !</aside>
 
 ```tsx
 import MovieCard from "@/components/movie/card/MovieCard";
@@ -518,7 +520,9 @@ Un squelette du composant `SearchBox` est déjà fourni dans le fichier `/src/co
 
 Tout le code ajouté est basé sur des hooks et des méthodes événementielles, il ne s'exécutera donc que dans le browser, côté client.
 
-Voici le code du composant terminé :
+Voici le code du composant terminé.
+
+<aside class="negative">Attention à bien importer les hooks depuis "next/navigation" (l'auto-complétion a tendance à proposer "next/router") !</aside>
 
 ```tsx
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
