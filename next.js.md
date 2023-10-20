@@ -12,6 +12,8 @@ Prérequis :
 - [Node / npm](https://nodejs.org/) (version 18 minimum)
 - [Visual Studio Code](https://code.visualstudio.com/) (ou tout autre IDE JS)
 
+<aside>Pour vérifier la version de Node utilisez la commande "node -v".</aside>
+
 <aside class="negative">Il est impératif d'avoir une version 18 minimale de Node.js car elle est un prérequis pour les React Server Components que nous verrons dans ce codelab.</aside>
 
 Pour ce codelab nous utiliserons deux repositories :
@@ -37,7 +39,7 @@ cd codelab-devfest2023-next
 npm install
 ```
 
-Lançons la commande `npm run dev` et vérifons qu'on a bien une application qui s'affiche sur l'url `http://localhost:3000`.
+Lançons la commande `npm run dev` et vérifions qu'on a bien une application qui s'affiche sur l'url `http://localhost:3000`.
 
 ## Client Side Rendering
 
